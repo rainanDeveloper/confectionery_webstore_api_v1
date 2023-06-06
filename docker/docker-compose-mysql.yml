@@ -1,0 +1,23 @@
+version: '3.1'
+
+services:
+  mysql-confectionery-webstore:
+    container_name: 'mysql-confectionery-webstore'
+    image: mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_DATABASE=confectionery_webstore
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql/init:/docker-entrypoint-initdb.d
+      - ./mysql/data:/var/lib/mysql
+    networks:
+        - default_webstore
+
+networks:
+  default_webstore:
+    name: 'default_webstore'
