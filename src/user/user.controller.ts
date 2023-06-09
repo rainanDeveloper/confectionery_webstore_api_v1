@@ -7,9 +7,12 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiOkResponse,
@@ -23,6 +26,8 @@ import { UserService } from './user.service';
 
 @Controller('user')
 @ApiTags('User')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 export class UserController {
   constructor(@Inject(UserService) private readonly userService: UserService) {}
 

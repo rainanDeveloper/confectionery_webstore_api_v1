@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compareSync } from 'bcrypt';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
+import { JwtPayloadDto } from './dtos/jwt-payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,11 @@ export class AuthService {
   ) {}
 
   async login(user: UserEntity) {
-    const payload = { sub: user.id, login: user.login, email: user.email };
+    const payload: JwtPayloadDto = {
+      sub: user.id,
+      login: user.login,
+      email: user.email,
+    };
 
     return {
       token: this.jwtService.sign(payload),
