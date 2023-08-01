@@ -30,10 +30,10 @@ export class UserEntity {
   firstAccess: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: string;
+  createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: string;
+  updatedAt: Date;
 
   @BeforeInsert()
   hashPassword() {
