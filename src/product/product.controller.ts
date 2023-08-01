@@ -1,5 +1,4 @@
-import { Controller, Inject } from '@nestjs/common';
-import { ProductService } from './product.service';
+import { Controller } from '@nestjs/common';
 
 @Controller('product')
 export class ProductController {}
