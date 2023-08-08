@@ -24,4 +24,10 @@ export class SearchProductDto {
   @IsOptional()
   @Min(0)
   maxUnitValue?: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(0)
+  page: number;
 }

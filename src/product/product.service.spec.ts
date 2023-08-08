@@ -1,6 +1,6 @@
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { randomUUID } from 'crypto';
 import { Between, Like, Repository } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { SearchProductDto } from './dtos/search-product.dto';
@@ -21,6 +21,12 @@ describe('ProductService', () => {
             create: jest.fn(),
             save: jest.fn(),
             find: jest.fn(),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValueOnce(`200`),
           },
         },
       ],
@@ -80,6 +86,24 @@ describe('ProductService', () => {
       expect(productRepository.find).toHaveBeenCalledTimes(1);
       expect(productRepository.find).toHaveBeenCalledWith({
         select: ['id', 'title', 'description', 'unitValue'],
+        skip: 0,
+        take: 200,
+      });
+    });
+
+    it('it should do a pagination', async () => {
+      const productsMock: ProductEntity[] = [new ProductEntity()];
+
+      jest.spyOn(productRepository, 'find').mockResolvedValueOnce(productsMock);
+
+      const products = await productService.findAll(5);
+
+      expect(products).toStrictEqual(productsMock);
+      expect(productRepository.find).toHaveBeenCalledTimes(1);
+      expect(productRepository.find).toHaveBeenCalledWith({
+        select: ['id', 'title', 'description', 'unitValue'],
+        skip: 800,
+        take: 200,
       });
     });
   });
@@ -92,6 +116,7 @@ describe('ProductService', () => {
 
       const searchDto: SearchProductDto = {
         searchTerm: 'some search term',
+        page: 1,
       };
 
       const products = await productService.search(searchDto);
@@ -104,6 +129,8 @@ describe('ProductService', () => {
           { description: Like(`%${searchDto.searchTerm}%`) },
         ],
         select: ['id', 'title', 'description', 'unitValue'],
+        skip: 0,
+        take: 200,
       });
     });
 
@@ -116,6 +143,7 @@ describe('ProductService', () => {
         searchTerm: 'some search term',
         minUnitValue: 30,
         maxUnitValue: 100,
+        page: 1,
       };
 
       const products = await productService.search(searchDto);
@@ -131,6 +159,33 @@ describe('ProductService', () => {
           },
         ],
         select: ['id', 'title', 'description', 'unitValue'],
+        skip: 0,
+        take: 200,
+      });
+    });
+
+    it('should do a pagination', async () => {
+      const productsMock: ProductEntity[] = [new ProductEntity()];
+
+      jest.spyOn(productRepository, 'find').mockResolvedValueOnce(productsMock);
+
+      const searchDto: SearchProductDto = {
+        searchTerm: 'some search term',
+        page: 4,
+      };
+
+      const products = await productService.search(searchDto);
+
+      expect(products).toStrictEqual(productsMock);
+      expect(productRepository.find).toHaveBeenCalledTimes(1);
+      expect(productRepository.find).toHaveBeenCalledWith({
+        where: [
+          { title: Like(`%${searchDto.searchTerm}%`) },
+          { description: Like(`%${searchDto.searchTerm}%`) },
+        ],
+        select: ['id', 'title', 'description', 'unitValue'],
+        skip: 600,
+        take: 200,
       });
     });
   });
