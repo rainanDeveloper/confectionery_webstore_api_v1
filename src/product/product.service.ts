@@ -21,7 +21,9 @@ export class ProductService {
   }
 
   async findAll(): Promise<ProductEntity[]> {
-    return await this.productRepository.find();
+    return await this.productRepository.find({
+      select: ['id', 'title', 'description', 'unitValue'],
+    });
   }
 
   async search(searchDto: SearchProductDto): Promise<ProductEntity[]> {
@@ -40,6 +42,7 @@ export class ProductService {
 
     return await this.productRepository.find({
       where,
+      select: ['id', 'title', 'description', 'unitValue'],
     });
   }
 }

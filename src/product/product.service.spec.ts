@@ -78,7 +78,9 @@ describe('ProductService', () => {
 
       expect(products).toStrictEqual(productsMock);
       expect(productRepository.find).toHaveBeenCalledTimes(1);
-      expect(productRepository.find).toHaveBeenCalledWith();
+      expect(productRepository.find).toHaveBeenCalledWith({
+        select: ['id', 'title', 'description', 'unitValue'],
+      });
     });
   });
 
@@ -101,6 +103,7 @@ describe('ProductService', () => {
           { title: Like(`%${searchDto.searchTerm}%`) },
           { description: Like(`%${searchDto.searchTerm}%`) },
         ],
+        select: ['id', 'title', 'description', 'unitValue'],
       });
     });
 
@@ -127,6 +130,7 @@ describe('ProductService', () => {
             unitValue: Between(searchDto.minUnitValue, searchDto.maxUnitValue),
           },
         ],
+        select: ['id', 'title', 'description', 'unitValue'],
       });
     });
   });
