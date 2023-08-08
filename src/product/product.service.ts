@@ -18,4 +18,8 @@ export class ProductService {
 
     return product;
   }
+
+  async findAll(): Promise<ProductEntity[]> {
+    return await this.productRepository.find();
+  }
 }

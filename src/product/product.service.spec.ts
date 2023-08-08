@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { ProductEntity } from './entities/product.entity';
@@ -18,6 +19,7 @@ describe('ProductService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            find: jest.fn(),
           },
         },
       ],
@@ -50,11 +52,30 @@ describe('ProductService', () => {
       productMock.cost = productDto.cost;
       productMock.unitValue = productDto.unitValue;
 
+      productMock.validateProduct();
+
       jest.spyOn(productRepository, 'create').mockReturnValueOnce(productMock);
 
       const newProduct = await productService.create(productDto);
 
       expect(newProduct).toBeDefined();
+      expect(newProduct).toStrictEqual(productMock);
+      expect(productRepository.create).toHaveBeenCalledTimes(1);
+      expect(productRepository.create).toHaveBeenCalledWith(productDto);
+      expect(productRepository.save).toHaveBeenCalledTimes(1);
+      expect(productRepository.save).toHaveBeenCalledWith(productMock);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should find a list of products', async () => {
+      const productsMock: ProductEntity[] = [new ProductEntity()];
+
+      jest.spyOn(productRepository, 'find').mockResolvedValueOnce(productsMock);
+
+      const products = await productService.findAll();
+
+      expect(products).toStrictEqual(productsMock);
     });
   });
 });
