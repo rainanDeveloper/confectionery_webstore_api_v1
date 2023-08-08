@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
-import { Repository } from 'typeorm';
+import { Between, Like, Repository } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
+import { SearchProductDto } from './dtos/search-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ProductService } from './product.service';
 
@@ -76,6 +77,57 @@ describe('ProductService', () => {
       const products = await productService.findAll();
 
       expect(products).toStrictEqual(productsMock);
+      expect(productRepository.find).toHaveBeenCalledTimes(1);
+      expect(productRepository.find).toHaveBeenCalledWith();
+    });
+  });
+
+  describe('search', () => {
+    it('should search using searchterm', async () => {
+      const productsMock: ProductEntity[] = [new ProductEntity()];
+
+      jest.spyOn(productRepository, 'find').mockResolvedValueOnce(productsMock);
+
+      const searchDto: SearchProductDto = {
+        searchTerm: 'some search term',
+      };
+
+      const products = await productService.search(searchDto);
+
+      expect(products).toStrictEqual(productsMock);
+      expect(productRepository.find).toHaveBeenCalledTimes(1);
+      expect(productRepository.find).toHaveBeenCalledWith({
+        where: [
+          { title: Like(`%${searchDto.searchTerm}%`) },
+          { description: Like(`%${searchDto.searchTerm}%`) },
+        ],
+      });
+    });
+
+    it('should add to search a unit value range', async () => {
+      const productsMock: ProductEntity[] = [new ProductEntity()];
+
+      jest.spyOn(productRepository, 'find').mockResolvedValueOnce(productsMock);
+
+      const searchDto: SearchProductDto = {
+        searchTerm: 'some search term',
+        minUnitValue: 30,
+        maxUnitValue: 100,
+      };
+
+      const products = await productService.search(searchDto);
+
+      expect(products).toStrictEqual(productsMock);
+      expect(productRepository.find).toHaveBeenCalledTimes(1);
+      expect(productRepository.find).toHaveBeenCalledWith({
+        where: [
+          { title: Like(`%${searchDto.searchTerm}%`) },
+          { description: Like(`%${searchDto.searchTerm}%`) },
+          {
+            unitValue: Between(searchDto.minUnitValue, searchDto.maxUnitValue),
+          },
+        ],
+      });
     });
   });
 });
