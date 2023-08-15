@@ -1,9 +1,11 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { randomUUID } from 'crypto';
 import { Between, Like, Repository } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { SearchProductDto } from './dtos/search-product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ProductService } from './product.service';
 
@@ -21,6 +23,7 @@ describe('ProductService', () => {
             create: jest.fn(),
             save: jest.fn(),
             find: jest.fn(),
+            update: jest.fn(),
           },
         },
         {
@@ -187,6 +190,33 @@ describe('ProductService', () => {
         skip: 600,
         take: 200,
       });
+    });
+  });
+
+  describe('update', () => {
+    it('should update a product successfully', async () => {
+      const productMock = new ProductEntity() as any;
+
+      const productDto: UpdateProductDto = {
+        title: 'New title',
+      };
+
+      const prodId = randomUUID();
+
+      jest
+        .spyOn(productRepository, 'update')
+        .mockResolvedValueOnce(productMock);
+
+      const result = await productService.update(prodId, productDto);
+
+      expect(result).toStrictEqual(productMock);
+      expect(productRepository.update).toHaveBeenCalledTimes(1);
+      expect(productRepository.update).toHaveBeenCalledWith(
+        {
+          id: prodId,
+        },
+        productDto,
+      );
     });
   });
 });

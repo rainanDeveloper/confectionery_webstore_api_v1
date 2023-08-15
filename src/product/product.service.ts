@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, FindOptionsWhere, Like, Repository } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { SearchProductDto } from './dtos/search-product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 
 @Injectable()
@@ -61,5 +62,14 @@ export class ProductService {
       skip,
       take,
     });
+  }
+
+  async update(productId: string, productDto: UpdateProductDto) {
+    return await this.productRepository.update(
+      {
+        id: productId,
+      },
+      productDto,
+    );
   }
 }
