@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { randomUUID } from 'crypto';
+import { UpdateResult } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
@@ -16,6 +19,7 @@ describe('ProductController', () => {
           provide: ProductService,
           useValue: {
             create: jest.fn(),
+            update: jest.fn(),
           },
         },
       ],
@@ -47,6 +51,28 @@ describe('ProductController', () => {
       expect(result).toStrictEqual(productMock);
       expect(productService.create).toHaveBeenCalledTimes(1);
       expect(productService.create).toHaveBeenCalledWith(productDto);
+    });
+  });
+
+  describe('update', () => {
+    it('should update a product successfully', async () => {
+      const updateResultMock = new UpdateResult();
+
+      const id = randomUUID();
+
+      const productDto: UpdateProductDto = {
+        title: 'some new title',
+      };
+
+      jest
+        .spyOn(productService, 'update')
+        .mockResolvedValueOnce(updateResultMock);
+
+      const result = await productController.update(id, productDto);
+
+      expect(result).toStrictEqual(updateResultMock);
+      expect(productService.update).toHaveBeenCalledTimes(1);
+      expect(productService.update).toHaveBeenCalledWith(id, productDto);
     });
   });
 });

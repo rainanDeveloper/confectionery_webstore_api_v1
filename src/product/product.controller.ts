@@ -1,7 +1,17 @@
-import { Controller, Inject, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Inject,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
+import { UpdateResult } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ProductService } from './product.service';
 
@@ -14,7 +24,16 @@ export class ProductController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  async create(productDto: CreateProductDto): Promise<ProductEntity> {
+  async create(@Body() productDto: CreateProductDto): Promise<ProductEntity> {
     return this.productService.create(productDto);
+  }
+
+  @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
+  async update(
+    @Param('id') id: string,
+    @Body() productDto: UpdateProductDto,
+  ): Promise<UpdateResult> {
+    return this.productService.update(id, productDto);
   }
 }
