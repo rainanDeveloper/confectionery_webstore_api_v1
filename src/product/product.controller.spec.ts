@@ -107,5 +107,21 @@ describe('ProductController', () => {
       expect(productService.search).toHaveBeenCalledTimes(1);
       expect(productService.search).toHaveBeenCalledWith(searchDto);
     });
+
+    it('should find all products on page 2', async () => {
+      const searchDto: SearchProductDto = {
+        page: 2,
+      };
+
+      const productsMock = [new ProductEntity()];
+
+      jest.spyOn(productService, 'findAll').mockResolvedValueOnce(productsMock);
+
+      const result = await productController.findAll(searchDto);
+
+      expect(result).toStrictEqual(productsMock);
+      expect(productService.findAll).toHaveBeenCalledTimes(1);
+      expect(productService.findAll).toHaveBeenCalledWith(searchDto.page);
+    });
   });
 });
