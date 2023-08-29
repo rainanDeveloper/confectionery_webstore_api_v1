@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
 import { UpdateResult } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
+import { SearchProductDto } from './dtos/search-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ProductController } from './product.controller';
@@ -21,6 +22,7 @@ describe('ProductController', () => {
             create: jest.fn(),
             update: jest.fn(),
             findAll: jest.fn(),
+            search: jest.fn(),
           },
         },
       ],
@@ -83,11 +85,27 @@ describe('ProductController', () => {
 
       jest.spyOn(productService, 'findAll').mockResolvedValueOnce(productsMock);
 
-      const result = await productController.findAll();
+      const result = await productController.findAll({});
 
       expect(result).toStrictEqual(productsMock);
       expect(productService.findAll).toHaveBeenCalledTimes(1);
       expect(productService.findAll).toHaveBeenCalledWith();
+    });
+
+    it('should search using searchTerm', async () => {
+      const searchDto: SearchProductDto = {
+        searchTerm: 'some search term',
+      };
+
+      const productsMock = [new ProductEntity()];
+
+      jest.spyOn(productService, 'search').mockResolvedValueOnce(productsMock);
+
+      const result = await productController.findAll(searchDto);
+
+      expect(result).toStrictEqual(productsMock);
+      expect(productService.search).toHaveBeenCalledTimes(1);
+      expect(productService.search).toHaveBeenCalledWith(searchDto);
     });
   });
 });

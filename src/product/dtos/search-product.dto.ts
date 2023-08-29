@@ -10,8 +10,8 @@ import {
 export class SearchProductDto {
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  searchTerm: string;
+  @IsOptional()
+  searchTerm?: string;
 
   @ApiProperty()
   @IsNumber()
@@ -27,7 +27,7 @@ export class SearchProductDto {
 
   @ApiProperty()
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   @Min(0)
-  page: number;
+  page?: number;
 }

@@ -6,12 +6,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdateResult } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
+import { SearchProductDto } from './dtos/search-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ProductService } from './product.service';
@@ -39,7 +41,20 @@ export class ProductController {
   }
 
   @Get()
-  async findAll(): Promise<ProductEntity[]> {
+  async findAll(
+    @Query() searchDto: SearchProductDto,
+  ): Promise<ProductEntity[]> {
+    const has_search =
+      Object.keys(searchDto).filter((key) => key !== 'page').length > 0;
+    const has_page =
+      Object.keys(searchDto).filter((key) => key == 'page').length > 0;
+
+    if (has_search) {
+      return await this.productService.search(searchDto);
+    }
+    if (has_page) {
+      return await this.productService.findAll(searchDto.page);
+    }
     return await this.productService.findAll();
   }
 }
