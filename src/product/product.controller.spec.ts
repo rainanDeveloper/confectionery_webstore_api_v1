@@ -20,6 +20,7 @@ describe('ProductController', () => {
           useValue: {
             create: jest.fn(),
             update: jest.fn(),
+            findAll: jest.fn(),
           },
         },
       ],
@@ -73,6 +74,20 @@ describe('ProductController', () => {
       expect(result).toStrictEqual(updateResultMock);
       expect(productService.update).toHaveBeenCalledTimes(1);
       expect(productService.update).toHaveBeenCalledWith(id, productDto);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should list all products', async () => {
+      const productsMock = [new ProductEntity()];
+
+      jest.spyOn(productService, 'findAll').mockResolvedValueOnce(productsMock);
+
+      const result = await productController.findAll();
+
+      expect(result).toStrictEqual(productsMock);
+      expect(productService.findAll).toHaveBeenCalledTimes(1);
+      expect(productService.findAll).toHaveBeenCalledWith();
     });
   });
 });

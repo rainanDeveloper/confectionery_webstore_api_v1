@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Inject,
   Param,
   Patch,
@@ -35,5 +36,10 @@ export class ProductController {
     @Body() productDto: UpdateProductDto,
   ): Promise<UpdateResult> {
     return this.productService.update(id, productDto);
+  }
+
+  @Get()
+  async findAll(): Promise<ProductEntity[]> {
+    return await this.productService.findAll();
   }
 }
