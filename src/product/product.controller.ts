@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateResult } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { SearchProductDto } from './dtos/search-product.dto';
@@ -28,12 +28,14 @@ export class ProductController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   async create(@Body() productDto: CreateProductDto): Promise<ProductEntity> {
     return this.productService.create(productDto);
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   async update(
     @Param('id') id: string,
     @Body() productDto: UpdateProductDto,
@@ -61,6 +63,7 @@ export class ProductController {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   async delete(@Param('id') id: string) {
     return await this.productService.delete(id);
   }
