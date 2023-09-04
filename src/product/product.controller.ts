@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -56,5 +57,11 @@ export class ProductController {
       return await this.productService.findAll(searchDto.page);
     }
     return await this.productService.findAll();
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
+  async delete(@Param('id') id: string) {
+    return await this.productService.delete(id);
   }
 }

@@ -24,6 +24,7 @@ describe('ProductService', () => {
             save: jest.fn(),
             find: jest.fn(),
             update: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
@@ -217,6 +218,20 @@ describe('ProductService', () => {
         },
         productDto,
       );
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a product sucessfully', async () => {
+      const productId = randomUUID();
+
+      jest.spyOn(productRepository, 'delete').mockResolvedValueOnce(null);
+
+      await productService.delete(productId);
+      expect(productRepository.delete).toHaveBeenCalledTimes(1);
+      expect(productRepository.delete).toHaveBeenCalledWith({
+        id: productId,
+      });
     });
   });
 });

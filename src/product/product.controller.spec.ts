@@ -23,6 +23,7 @@ describe('ProductController', () => {
             update: jest.fn(),
             findAll: jest.fn(),
             search: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -122,6 +123,19 @@ describe('ProductController', () => {
       expect(result).toStrictEqual(productsMock);
       expect(productService.findAll).toHaveBeenCalledTimes(1);
       expect(productService.findAll).toHaveBeenCalledWith(searchDto.page);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a product successfully', async () => {
+      const productId = randomUUID();
+
+      jest.spyOn(productService, 'delete').mockResolvedValueOnce(null);
+
+      await productController.delete(productId);
+
+      expect(productService.delete).toHaveBeenCalledTimes(1);
+      expect(productService.delete).toHaveBeenCalledWith(productId);
     });
   });
 });

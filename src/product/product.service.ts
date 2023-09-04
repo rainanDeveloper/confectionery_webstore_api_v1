@@ -72,4 +72,10 @@ export class ProductService {
       productDto,
     );
   }
+
+  async delete(productId: string) {
+    return await this.productRepository.delete({
+      id: productId,
+    });
+  }
 }
