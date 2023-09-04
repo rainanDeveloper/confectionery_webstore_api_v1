@@ -56,7 +56,7 @@ describe('UserService', () => {
         firstAccess: true,
         createdAt: new Date().toString(),
         updatedAt: new Date().toString(),
-      } as UserEntity;
+      } as any;
 
       jest.spyOn(userRepository, 'create').mockReturnValueOnce(userMock);
 
@@ -84,7 +84,7 @@ describe('UserService', () => {
         firstAccess: true,
         createdAt: new Date().toString(),
         updatedAt: new Date().toString(),
-      } as UserEntity;
+      } as any;
 
       jest.spyOn(userRepository, 'create').mockReturnValueOnce(userMock);
       jest.spyOn(userRepository, 'save').mockRejectedValueOnce(new Error());
@@ -125,7 +125,7 @@ describe('UserService', () => {
         firstAccess: true,
         createdAt: new Date().toString(),
         updatedAt: new Date().toString(),
-      } as UserEntity;
+      } as any;
 
       jest
         .spyOn(userRepository, 'findOneOrFail')
@@ -173,7 +173,7 @@ describe('UserService', () => {
         firstAccess: true,
         createdAt: new Date().toString(),
         updatedAt: new Date().toString(),
-      } as UserEntity;
+      } as any;
 
       jest
         .spyOn(userRepository, 'findOneOrFail')
@@ -224,7 +224,7 @@ describe('UserService', () => {
         firstAccess: true,
         createdAt: new Date().toString(),
         updatedAt: new Date().toString(),
-      } as UserEntity;
+      } as any;
 
       jest.spyOn(userService, 'findOneById').mockResolvedValueOnce(userMock);
 
@@ -253,7 +253,7 @@ describe('UserService', () => {
         firstAccess: true,
         createdAt: new Date().toString(),
         updatedAt: new Date().toString(),
-      } as UserEntity;
+      } as any;
 
       jest.spyOn(userService, 'findOneById').mockResolvedValueOnce(userMock);
 
