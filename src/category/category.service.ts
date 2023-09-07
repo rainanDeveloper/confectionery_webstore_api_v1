@@ -17,4 +17,8 @@ export class CategoryService {
     await this.categoryRepo.save(product);
     return;
   }
+
+  async findAll(): Promise<CategoryEntity[]> {
+    return await this.categoryRepo.find();
+  }
 }

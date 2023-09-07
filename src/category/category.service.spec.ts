@@ -18,6 +18,7 @@ describe('CategoryService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            find: jest.fn(),
           },
         },
       ],
@@ -79,6 +80,21 @@ describe('CategoryService', () => {
       expect(categoryRepository.create).toHaveBeenCalledWith(categoryDto);
       expect(categoryRepository.save).toHaveBeenCalledTimes(1);
       expect(categoryRepository.save).toHaveBeenCalledWith(categoryMock);
+    });
+  });
+  describe('findAll', () => {
+    it('should find a list of categories', async () => {
+      const categoriesMock = [new CategoryEntity()];
+
+      jest
+        .spyOn(categoryRepository, 'find')
+        .mockResolvedValueOnce(categoriesMock);
+
+      const result = await categoryService.findAll();
+
+      expect(result).toEqual(categoriesMock);
+      expect(categoryRepository.find).toHaveBeenCalledTimes(1);
+      expect(categoryRepository.find).toHaveBeenCalledWith();
     });
   });
 });
