@@ -22,6 +22,7 @@ describe('CategoryService', () => {
             save: jest.fn(),
             find: jest.fn(),
             update: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -119,6 +120,17 @@ describe('CategoryService', () => {
         },
         categoryDto,
       );
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a produce successfully', async () => {
+      const categoryId = randomUUID();
+
+      const result = await categoryService.delete(categoryId);
+
+      expect(result).not.toBeDefined();
+      expect(categoryRepository.delete).toHaveBeenCalledTimes(1);
     });
   });
 });

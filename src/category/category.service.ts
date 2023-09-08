@@ -38,5 +38,10 @@ export class CategoryService {
     return;
   }
 
-  delete;
+  async delete(categoryId: string): Promise<null | undefined> {
+    await this.categoryRepo.delete({
+      id: categoryId,
+    });
+    return;
+  }
 }
