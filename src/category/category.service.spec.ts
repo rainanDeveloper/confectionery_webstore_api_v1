@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { CategoryEntity } from './entities/category.entity';
 
 describe('CategoryService', () => {
@@ -19,6 +21,7 @@ describe('CategoryService', () => {
             create: jest.fn(),
             save: jest.fn(),
             find: jest.fn(),
+            update: jest.fn(),
           },
         },
       ],
@@ -82,6 +85,7 @@ describe('CategoryService', () => {
       expect(categoryRepository.save).toHaveBeenCalledWith(categoryMock);
     });
   });
+
   describe('findAll', () => {
     it('should find a list of categories', async () => {
       const categoriesMock = [new CategoryEntity()];
@@ -95,6 +99,26 @@ describe('CategoryService', () => {
       expect(result).toEqual(categoriesMock);
       expect(categoryRepository.find).toHaveBeenCalledTimes(1);
       expect(categoryRepository.find).toHaveBeenCalledWith();
+    });
+  });
+
+  describe('updateOne', () => {
+    it('should update a product successfully', async () => {
+      const categoryId = randomUUID();
+      const categoryDto: UpdateCategoryDto = {
+        title: 'some new title',
+      };
+
+      const result = await categoryService.updateOne(categoryId, categoryDto);
+
+      expect(result).not.toBeDefined();
+      expect(categoryRepository.update).toHaveBeenCalledTimes(1);
+      expect(categoryRepository.update).toHaveBeenCalledWith(
+        {
+          id: categoryId,
+        },
+        categoryDto,
+      );
     });
   });
 });
