@@ -102,14 +102,14 @@ describe('CategoryService', () => {
     });
   });
 
-  describe('updateOne', () => {
+  describe('update', () => {
     it('should update a product successfully', async () => {
       const categoryId = randomUUID();
       const categoryDto: UpdateCategoryDto = {
         title: 'some new title',
       };
 
-      const result = await categoryService.updateOne(categoryId, categoryDto);
+      const result = await categoryService.update(categoryId, categoryDto);
 
       expect(result).not.toBeDefined();
       expect(categoryRepository.update).toHaveBeenCalledTimes(1);

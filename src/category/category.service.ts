@@ -25,7 +25,7 @@ export class CategoryService {
     return await this.categoryRepo.find();
   }
 
-  async updateOne(
+  async update(
     categoryId: string,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<null | undefined> {
@@ -37,4 +37,6 @@ export class CategoryService {
     );
     return;
   }
+
+  delete;
 }
