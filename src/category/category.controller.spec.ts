@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { randomUUID } from 'crypto';
 import { CategoryController } from './category.controller';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { CategoryEntity } from './entities/category.entity';
 
 describe('CategoryController', () => {
@@ -17,6 +19,7 @@ describe('CategoryController', () => {
           useValue: {
             create: jest.fn(),
             findAll: jest.fn(),
+            update: jest.fn(),
           },
         },
       ],
@@ -58,6 +61,19 @@ describe('CategoryController', () => {
       expect(result).toStrictEqual(categoriesMock);
       expect(categoryService.findAll).toHaveBeenCalledTimes(1);
       expect(categoryService.findAll).toHaveBeenCalledWith();
+    });
+  });
+
+  describe('update', () => {
+    it('should update a user sucessfully', async () => {
+      const categoryId = randomUUID();
+      const categoryDto: UpdateCategoryDto = {
+        title: 'new title',
+      };
+
+      const result = await categoryController.update(categoryId, categoryDto);
+
+      expect(result).not.toBeDefined();
     });
   });
 });
