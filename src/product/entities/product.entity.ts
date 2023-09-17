@@ -1,8 +1,11 @@
+import { CategoryEntity } from 'src/category/entities/category.entity';
 import {
   BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -53,6 +56,12 @@ export class ProductEntity {
     default: 0,
   })
   unitValue: number;
+
+  @ManyToMany(() => CategoryEntity, (category) => category.products)
+  @JoinTable({
+    name: 'product_category',
+  })
+  categories: CategoryEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
