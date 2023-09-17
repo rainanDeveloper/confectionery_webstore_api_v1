@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -44,5 +45,12 @@ export class CategoryController {
     @Body() categoryDto: UpdateCategoryDto,
   ) {
     return await this.categoryService.update(id, categoryDto);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async delete(@Param('id') id: string) {
+    return await this.categoryService.delete(id);
   }
 }

@@ -20,6 +20,7 @@ describe('CategoryController', () => {
             create: jest.fn(),
             findAll: jest.fn(),
             update: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -74,6 +75,18 @@ describe('CategoryController', () => {
       const result = await categoryController.update(categoryId, categoryDto);
 
       expect(result).not.toBeDefined();
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a category sucessfully', async () => {
+      const categoryId = randomUUID();
+
+      const result = await categoryController.delete(categoryId);
+
+      expect(result).not.toBeDefined();
+      expect(categoryService.delete).toBeCalledTimes(1);
+      expect(categoryService.delete).toBeCalledWith(categoryId);
     });
   });
 });
