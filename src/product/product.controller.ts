@@ -36,10 +36,7 @@ export class ProductController {
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  async update(
-    @Param('id') id: string,
-    @Body() productDto: UpdateProductDto,
-  ): Promise<UpdateResult> {
+  async update(@Param('id') id: string, @Body() productDto: UpdateProductDto) {
     return this.productService.update(id, productDto);
   }
 

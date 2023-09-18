@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { LinkCategoryDto } from './create-product.dto';
 
 export class UpdateProductDto {
   @ApiProperty()
@@ -27,4 +28,9 @@ export class UpdateProductDto {
   @IsNumber()
   @IsOptional()
   unitValue?: number;
+
+  @ApiProperty()
+  @IsArray()
+  @IsOptional()
+  categories?: LinkCategoryDto[];
 }

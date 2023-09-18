@@ -68,13 +68,9 @@ describe('ProductController', () => {
         title: 'some new title',
       };
 
-      jest
-        .spyOn(productService, 'update')
-        .mockResolvedValueOnce(updateResultMock);
-
       const result = await productController.update(id, productDto);
 
-      expect(result).toStrictEqual(updateResultMock);
+      expect(result).not.toBeDefined();
       expect(productService.update).toHaveBeenCalledTimes(1);
       expect(productService.update).toHaveBeenCalledWith(id, productDto);
     });

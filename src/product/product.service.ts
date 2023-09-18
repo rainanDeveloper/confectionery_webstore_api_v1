@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, FindOptionsWhere, Like, Repository } from 'typeorm';
@@ -33,7 +33,8 @@ export class ProductService {
     const take = this.paginationAmount;
 
     return await this.productRepository.find({
-      select: ['id', 'title', 'description', 'unitValue'],
+      select: ['id', 'title', 'description', 'categories', 'unitValue'],
+      relations: ['categories'],
       skip,
       take,
     });
@@ -65,12 +66,24 @@ export class ProductService {
   }
 
   async update(productId: string, productDto: UpdateProductDto) {
-    return await this.productRepository.update(
-      {
-        id: productId,
-      },
-      productDto,
-    );
+    const existent = await this.productRepository.findOneBy({
+      id: productId,
+    });
+
+    if (!existent) {
+      throw new NotFoundException(`Product ${productId} not found!`);
+    }
+
+    existent.title = productDto.title;
+    existent.description = productDto.description;
+    existent.cost = productDto.cost;
+    existent.profitPercent = productDto.profitPercent;
+    existent.unitValue = productDto.unitValue;
+    existent.categories = productDto.categories as any;
+
+    await this.productRepository.save(existent);
+
+    return;
   }
 
   async delete(productId: string) {
