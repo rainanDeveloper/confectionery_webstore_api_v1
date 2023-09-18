@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CategoryEntity } from 'src/category/entities/category.entity';
 import { Between, FindOptionsWhere, Like, Repository } from 'typeorm';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { SearchProductDto } from './dtos/search-product.dto';
@@ -33,7 +34,8 @@ export class ProductService {
     const take = this.paginationAmount;
 
     return await this.productRepository.find({
-      select: ['id', 'title', 'description', 'unitValue'],
+      select: ['id', 'title', 'description', 'categories', 'unitValue'],
+      relations: ['categories'],
       skip,
       take,
     });

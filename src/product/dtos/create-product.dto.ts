@@ -1,11 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsArray,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   Min,
 } from 'class-validator';
+
+export class LinkCategoryDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+}
 
 export class CreateProductDto {
   @ApiProperty()
@@ -32,4 +40,9 @@ export class CreateProductDto {
   @IsNumber()
   @IsNotEmpty()
   unitValue: number;
+
+  @ApiProperty()
+  @IsArray()
+  @IsOptional()
+  categories?: LinkCategoryDto[];
 }
