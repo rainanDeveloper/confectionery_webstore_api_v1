@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -23,6 +24,7 @@ describe('ProductService', () => {
             create: jest.fn(),
             save: jest.fn(),
             find: jest.fn(),
+            findOneBy: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
           },
@@ -89,7 +91,8 @@ describe('ProductService', () => {
       expect(products).toStrictEqual(productsMock);
       expect(productRepository.find).toHaveBeenCalledTimes(1);
       expect(productRepository.find).toHaveBeenCalledWith({
-        select: ['id', 'title', 'description', 'unitValue'],
+        select: ['id', 'title', 'description', 'categories', 'unitValue'],
+        relations: ['categories'],
         skip: 0,
         take: 200,
       });
@@ -105,7 +108,8 @@ describe('ProductService', () => {
       expect(products).toStrictEqual(productsMock);
       expect(productRepository.find).toHaveBeenCalledTimes(1);
       expect(productRepository.find).toHaveBeenCalledWith({
-        select: ['id', 'title', 'description', 'unitValue'],
+        select: ['id', 'title', 'description', 'categories', 'unitValue'],
+        relations: ['categories'],
         skip: 800,
         take: 200,
       });
@@ -205,19 +209,31 @@ describe('ProductService', () => {
       const prodId = randomUUID();
 
       jest
-        .spyOn(productRepository, 'update')
+        .spyOn(productRepository, 'findOneBy')
         .mockResolvedValueOnce(productMock);
 
       const result = await productService.update(prodId, productDto);
 
-      expect(result).toStrictEqual(productMock);
-      expect(productRepository.update).toHaveBeenCalledTimes(1);
-      expect(productRepository.update).toHaveBeenCalledWith(
-        {
-          id: prodId,
-        },
-        productDto,
-      );
+      expect(result).not.toBeDefined();
+      expect(productRepository.findOneBy).toHaveBeenCalledTimes(1);
+      expect(productRepository.findOneBy).toHaveBeenCalledWith({
+        id: prodId,
+      });
+      expect(productRepository.save).toHaveBeenCalledTimes(1);
+    });
+
+    it('should throw a NotFoundException when the product is not found', async () => {
+      const productDto: UpdateProductDto = {
+        title: 'New title',
+      };
+
+      const prodId = randomUUID();
+
+      jest.spyOn(productRepository, 'findOneBy').mockResolvedValueOnce(null);
+
+      const resultPromise = productService.update(prodId, productDto);
+
+      expect(resultPromise).rejects.toThrow(NotFoundException);
     });
   });
 
