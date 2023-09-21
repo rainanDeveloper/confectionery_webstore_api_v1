@@ -50,7 +50,7 @@ describe('SeederService', () => {
         firstAccess: true,
         createdAt: new Date().toString(),
         updatedAt: new Date().toString(),
-      } as UserEntity;
+      } as any;
 
       jest.spyOn(userService, 'findAll').mockResolvedValueOnce([userMock]);
       await seederService.onApplicationBootstrap();
