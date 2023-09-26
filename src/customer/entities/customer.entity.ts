@@ -58,8 +58,6 @@ export class CustomerEntity {
 
   @BeforeInsert()
   hashPassword() {
-    if (this.password) {
-      this.password = hashSync(this.password, BcryptHelper.saltRounds);
-    }
+    this.password = hashSync(this.password, BcryptHelper.saltRounds);
   }
 }
