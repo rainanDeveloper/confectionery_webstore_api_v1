@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
+import { UpdateCustomerDto } from './dtos/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
 
 describe('CustomerService', () => {
@@ -19,6 +20,9 @@ describe('CustomerService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            findOneBy: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -68,6 +72,71 @@ describe('CustomerService', () => {
       expect(customerRepository.create).toHaveBeenCalledTimes(1);
       expect(customerRepository.save).toHaveBeenCalledWith(customerMock);
       expect(customerRepository.save).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('findOne', () => {
+    it('should find a customer successfully', async () => {
+      const customerMock = new CustomerEntity();
+      const id = randomUUID();
+      customerMock.id = id;
+
+      jest
+        .spyOn(customerRepository, 'findOneBy')
+        .mockResolvedValueOnce(customerMock);
+
+      const result = await customerService.findOne(id);
+
+      expect(result).toStrictEqual(customerMock);
+      expect(customerRepository.findOneBy).toHaveBeenCalledTimes(1);
+      expect(customerRepository.findOneBy).toHaveBeenCalledWith({
+        id,
+      });
+    });
+  });
+
+  describe('update', () => {
+    it('should update the customer successfully', async () => {
+      const customerMock = new CustomerEntity();
+      const id = randomUUID();
+      customerMock.id = id;
+
+      const customerDto: UpdateCustomerDto = {
+        login: 'SomeNewLogin',
+      };
+
+      jest
+        .spyOn(customerService, 'findOne')
+        .mockResolvedValueOnce(customerMock);
+
+      const result = await customerService.update(id, customerDto);
+
+      expect(result).toStrictEqual(id);
+      expect(customerService.findOne).toHaveBeenCalledTimes(1);
+      expect(customerService.findOne).toHaveBeenCalledWith(id);
+      expect(customerRepository.update).toHaveBeenCalledTimes(1);
+      expect(customerRepository.update).toHaveBeenCalledWith(
+        { id },
+        customerDto,
+      );
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a customer sucessfully', async () => {
+      const customerMock = new CustomerEntity();
+      const id = randomUUID();
+      customerMock.id = id;
+
+      jest
+        .spyOn(customerService, 'findOne')
+        .mockResolvedValueOnce(customerMock);
+
+      const result = await customerService.delete(id);
+
+      expect(result).not.toBeDefined();
+      expect(customerRepository.delete).toHaveBeenCalledTimes(1);
+      expect(customerRepository.delete).toHaveBeenCalledWith({ id });
     });
   });
 });

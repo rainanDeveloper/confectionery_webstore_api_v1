@@ -44,4 +44,11 @@ export class CustomerService {
 
     return id;
   }
+
+  async delete(id: string) {
+    await this.findOne(id);
+    await this.customerRepository.delete({
+      id,
+    });
+  }
 }
