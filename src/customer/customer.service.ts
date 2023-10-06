@@ -21,8 +21,11 @@ export class CustomerService {
   }
 
   async findOne(id: string): Promise<CustomerEntity> {
-    const finded = await this.customerRepository.findOneBy({
-      id,
+    const finded = await this.customerRepository.findOne({
+      where: {
+        id,
+      },
+      select: ['id', 'login', 'email', 'name', 'contactPhone', 'whatsapp'],
     });
 
     if (!finded) {
