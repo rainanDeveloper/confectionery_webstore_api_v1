@@ -29,7 +29,7 @@ export class CustomerService {
     });
 
     if (!finded) {
-      throw new NotFoundException(`Customer ${id} was not found!`);
+      throw new NotFoundException(`Customer ${id} was not found`);
     }
 
     return finded;
