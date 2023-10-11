@@ -2,6 +2,7 @@ import { hashSync } from 'bcrypt';
 import { BcryptHelper } from 'src/helpers/bcrypt.helpers';
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -57,6 +58,7 @@ export class CustomerEntity {
   updatedAt: Date;
 
   @BeforeInsert()
+  @BeforeUpdate()
   hashPassword() {
     this.password = hashSync(this.password, BcryptHelper.saltRounds);
   }
