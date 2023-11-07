@@ -20,7 +20,7 @@ describe('CustomerService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
-            findOneBy: jest.fn(),
+            findOne: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
           },
@@ -82,15 +82,26 @@ describe('CustomerService', () => {
       customerMock.id = id;
 
       jest
-        .spyOn(customerRepository, 'findOneBy')
+        .spyOn(customerRepository, 'findOne')
         .mockResolvedValueOnce(customerMock);
 
       const result = await customerService.findOne(id);
 
       expect(result).toStrictEqual(customerMock);
-      expect(customerRepository.findOneBy).toHaveBeenCalledTimes(1);
-      expect(customerRepository.findOneBy).toHaveBeenCalledWith({
-        id,
+      expect(customerRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(customerRepository.findOne).toHaveBeenCalledWith({
+        select: [
+          'id',
+          'login',
+          'email',
+          'name',
+          'contactPhone',
+          'whatsapp',
+          'addresses',
+        ],
+        where: {
+          id,
+        },
       });
     });
   });

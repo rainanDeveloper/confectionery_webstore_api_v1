@@ -25,7 +25,14 @@ export class CustomerService {
       where: {
         id,
       },
-      select: ['id', 'login', 'email', 'name', 'contactPhone', 'whatsapp'],
+      select: [
+        'id',
+        'login',
+        'email',
+        'name',
+        'contactPhone',
+        'whatsapp',        'addresses',
+      ],
     });
 
     if (!finded) {
