@@ -1,4 +1,5 @@
 import { hashSync } from 'bcrypt';
+import { CustomerAddressEntity } from 'src/customer-address/entities/customer-address.entity';
 import { BcryptHelper } from 'src/helpers/bcrypt.helpers';
 import {
   BeforeInsert,
@@ -6,6 +7,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -50,6 +52,9 @@ export class CustomerEntity {
     length: 15,
   })
   whatsapp: string;
+
+  @OneToMany(() => CustomerAddressEntity, (address) => address.customer)
+  addresses: CustomerAddressEntity;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
