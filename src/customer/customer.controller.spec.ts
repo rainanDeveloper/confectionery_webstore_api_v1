@@ -6,6 +6,7 @@ import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { randomUUID } from 'crypto';
 import { HttpStatus } from '@nestjs/common';
 import { CustomerEntity } from './entities/customer.entity';
+import { UpdateCustomerDto } from './dtos/update-customer.dto';
 
 describe('CustomerController', () => {
   let customerController: CustomerController;
@@ -40,6 +41,7 @@ describe('CustomerController', () => {
           useValue: {
             create: jest.fn(),
             findOne: jest.fn(),
+            update: jest.fn(),
           },
         },
       ],
@@ -103,6 +105,42 @@ describe('CustomerController', () => {
       expect(result).toStrictEqual(customerMock);
       expect(customerService.findOne).toHaveBeenCalledTimes(1);
       expect(customerService.findOne).toHaveBeenCalledWith(customerId);
+    });
+  });
+
+  describe('update', () => {
+    it('should update a customer successfully', async () => {
+      const sendMock = jest.fn().mockReturnValue(undefined);
+      const statusMock = jest.fn().mockImplementation((_status: number) => {
+        return {
+          send: sendMock,
+        };
+      });
+      const headerMock = jest.fn().mockReturnValue({ status: statusMock });
+
+      const responseMock = {
+        header: headerMock,
+      } as any;
+
+      const customerId = randomUUID();
+
+      const updateCustomerDto: UpdateCustomerDto = {
+        name: 'Some New name',
+      };
+
+      const result = await customerController.update(
+        customerId,
+        updateCustomerDto,
+        responseMock,
+      );
+
+      expect(result).toBeUndefined();
+      expect(customerService.update).toHaveBeenCalledTimes(1);
+      expect(customerService.update).toHaveBeenCalledWith(
+        customerId,
+        updateCustomerDto,
+      );
+      expect(headerMock).toHaveBeenCalledTimes(1);
     });
   });
 });
