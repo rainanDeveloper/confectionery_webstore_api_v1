@@ -5,6 +5,7 @@
     "docker",
     "test",
     "dist",
-    "**/*spec.ts"
+    "**/*spec.ts",
+    "package.*"
   ]
 }
