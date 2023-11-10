@@ -6,6 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateCustomerAddressDto } from './dtos/create-customer-address.dto';
 import { randomUUID } from 'crypto';
 import { UpdateCustomerAddressDto } from './dtos/update-customer-address.dto';
+import { NotFoundException } from '@nestjs/common';
 
 describe('CustomerAddressService', () => {
   let customerAddressService: CustomerAddressService;
@@ -43,6 +44,7 @@ describe('CustomerAddressService', () => {
             save: jest.fn(),
             findOne: jest.fn(),
             update: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -130,13 +132,62 @@ describe('CustomerAddressService', () => {
         updateCustomerAddressDto,
       );
     });
+
+    it('should return a not found error', async () => {
+      jest.spyOn(customerAddressService, 'findOne').mockResolvedValueOnce(null);
+      const updateCustomerAddressDto: UpdateCustomerAddressDto = {
+        city: 'BA',
+      };
+
+      const resultPromise = customerAddressService.update(
+        customerAddressIdMock,
+        updateCustomerAddressDto,
+      );
+
+      expect(resultPromise).rejects.toThrow(NotFoundException);
+      expect(customerAddressService.findOne).toHaveBeenCalledTimes(1);
+      expect(customerAddressService.findOne).toHaveBeenCalledWith(
+        customerAddressIdMock,
+      );
+      expect(customerAddressRepository.update).not.toHaveBeenCalled();
+    });
   });
 
   describe('delete', () => {
-    it('', async () => {
-      //Arrange
-      //Assert
-      //Act
+    it('should delete a customer address successfully', async () => {
+      jest
+        .spyOn(customerAddressService, 'findOne')
+        .mockResolvedValueOnce(customerAddressEntityMock);
+
+      const result = await customerAddressService.delete(customerAddressIdMock);
+
+      expect(result).toStrictEqual(customerAddressIdMock);
+      expect(customerAddressService.findOne).toHaveBeenCalledTimes(1);
+      expect(customerAddressService.findOne).toHaveBeenCalledWith(
+        customerAddressIdMock,
+      );
+      expect(customerAddressRepository.delete).toHaveBeenCalledTimes(1);
+      expect(customerAddressRepository.delete).toHaveBeenCalledWith({
+        id: customerAddressIdMock,
+      });
+    });
+
+    it('should return a not found error', async () => {
+      jest.spyOn(customerAddressService, 'findOne').mockResolvedValueOnce(null);
+      const updateCustomerAddressDto: UpdateCustomerAddressDto = {
+        city: 'BA',
+      };
+
+      const resultPromise = customerAddressService.delete(
+        customerAddressIdMock,
+      );
+
+      expect(resultPromise).rejects.toThrow(NotFoundException);
+      expect(customerAddressService.findOne).toHaveBeenCalledTimes(1);
+      expect(customerAddressService.findOne).toHaveBeenCalledWith(
+        customerAddressIdMock,
+      );
+      expect(customerAddressRepository.delete).not.toHaveBeenCalled();
     });
   });
 });

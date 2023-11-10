@@ -48,4 +48,15 @@ export class CustomerAddressService {
     );
     return id;
   }
+
+  async delete(id: string): Promise<string> {
+    const finded = await this.findOne(id);
+    if (!finded) {
+      throw new NotFoundException(`Customer address ${id} wasn't found!`);
+    }
+    await this.customerAddressRepository.delete({
+      id,
+    });
+    return id;
+  }
 }
