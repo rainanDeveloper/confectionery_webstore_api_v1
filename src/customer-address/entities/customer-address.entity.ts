@@ -22,8 +22,8 @@ export class CustomerAddressEntity {
   @Column({ name: 'address_line_1', type: 'varchar', nullable: false })
   addressLine1: string;
 
-  @Column({ name: 'address_line_2', type: 'varchar', nullable: false })
-  addressLine2: string;
+  @Column({ name: 'address_line_2', type: 'varchar', nullable: true })
+  addressLine2?: string;
 
   @Column({ type: 'varchar', nullable: false })
   city: string;
