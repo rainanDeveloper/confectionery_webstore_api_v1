@@ -42,6 +42,7 @@ describe('CustomerController', () => {
             create: jest.fn(),
             findOne: jest.fn(),
             update: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -141,6 +142,18 @@ describe('CustomerController', () => {
         updateCustomerDto,
       );
       expect(headerMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a customer successfully', async () => {
+      const customerId = randomUUID();
+
+      const result = await customerController.delete(customerId);
+
+      expect(result).toBeUndefined();
+      expect(customerService.delete).toHaveBeenCalledTimes(1);
+      expect(customerService.delete).toHaveBeenCalledWith(customerId);
     });
   });
 });

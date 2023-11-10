@@ -31,7 +31,8 @@ export class CustomerService {
         'email',
         'name',
         'contactPhone',
-        'whatsapp',        'addresses',
+        'whatsapp',
+        'addresses',
       ],
     });
 
