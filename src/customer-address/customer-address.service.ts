@@ -22,4 +22,12 @@ export class CustomerAddressService {
 
     return createdCustomerAddress.id;
   }
+
+  async findOne(id: string): Promise<CustomerAddressEntity> {
+    return this.customerAddressRepository.findOne({
+      where: {
+        id,
+      },
+    });
+  }
 }

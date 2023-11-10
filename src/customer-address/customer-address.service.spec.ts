@@ -10,6 +10,27 @@ describe('CustomerAddressService', () => {
   let customerAddressService: CustomerAddressService;
   let customerAddressRepository: Repository<CustomerAddressEntity>;
 
+  const customerAddressIdMock = randomUUID();
+  const createCustomerAddressDto: CreateCustomerAddressDto = {
+    customer: {
+      id: randomUUID(),
+    },
+    zipCode: '50620210',
+    addressLine1: 'Rua Buaitirema',
+    addressLine2: 'Torre',
+    city: 'Recife',
+    state: 'PE',
+    country: 'Brasil',
+  };
+  const nowMock = new Date();
+
+  const customerAddressEntityMock = {
+    id: customerAddressIdMock,
+    ...createCustomerAddressDto,
+    createdAt: nowMock,
+    updatedAt: nowMock,
+  } as CustomerAddressEntity;
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -19,6 +40,7 @@ describe('CustomerAddressService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            findOne: jest.fn(),
           },
         },
       ],
@@ -39,28 +61,6 @@ describe('CustomerAddressService', () => {
 
   describe('create', () => {
     it('should create a customer successfully', async () => {
-      const customerAddressIdMock = randomUUID();
-
-      const createCustomerAddressDto: CreateCustomerAddressDto = {
-        customer: {
-          id: randomUUID(),
-        },
-        zipCode: '50620210',
-        addressLine1: 'Rua Buaitirema',
-        addressLine2: 'Torre',
-        city: 'Recife',
-        state: 'PE',
-        country: 'Brasil',
-      };
-      const nowMock = new Date();
-
-      const customerAddressEntityMock = {
-        id: customerAddressIdMock,
-        ...createCustomerAddressDto,
-        createdAt: nowMock,
-        updatedAt: nowMock,
-      } as CustomerAddressEntity;
-
       jest
         .spyOn(customerAddressRepository, 'create')
         .mockReturnValueOnce(customerAddressEntityMock);
@@ -78,6 +78,26 @@ describe('CustomerAddressService', () => {
       expect(customerAddressRepository.save).toHaveBeenCalledWith(
         customerAddressEntityMock,
       );
+    });
+  });
+
+  describe('findOne', () => {
+    it('should find a customer sucessfully ', async () => {
+      jest
+        .spyOn(customerAddressRepository, 'findOne')
+        .mockResolvedValueOnce(customerAddressEntityMock);
+
+      const result = await customerAddressService.findOne(
+        customerAddressIdMock,
+      );
+
+      expect(result).toStrictEqual(customerAddressEntityMock);
+      expect(customerAddressRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(customerAddressRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: customerAddressIdMock,
+        },
+      });
     });
   });
 });
