@@ -106,6 +106,37 @@ describe('CustomerService', () => {
     });
   });
 
+  describe('findOneByLoginOrEmail', () => {
+    it('should find a user by login or email', async () => {
+      const loginOrEmail = 'some_login';
+
+      const customerMock: CustomerEntity = new CustomerEntity();
+
+      customerMock.login = loginOrEmail;
+
+      jest
+        .spyOn(customerRepository, 'findOne')
+        .mockResolvedValueOnce(customerMock);
+
+      const response = await customerService.findOneByLoginOrEmail(
+        loginOrEmail,
+      );
+
+      expect(response).toStrictEqual(customerMock);
+      expect(customerRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(customerRepository.findOne).toHaveBeenCalledWith({
+        where: [
+          {
+            email: loginOrEmail,
+          },
+          {
+            login: loginOrEmail,
+          },
+        ],
+      });
+    });
+  });
+
   describe('update', () => {
     it('should update the customer successfully', async () => {
       const customerMock = new CustomerEntity();
