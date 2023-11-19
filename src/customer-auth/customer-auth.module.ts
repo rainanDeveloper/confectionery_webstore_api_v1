@@ -3,6 +3,8 @@ import { CustomerAuthService } from './customer-auth.service';
 import { CustomerModule } from 'src/customer/customer.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { CustomerAuthController } from './customer-auth.controller';
+import { AuthCustomerStrategy } from './strategies/auth-customer.strategy';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { JwtModule } from '@nestjs/jwt';
       inject: [ConfigService],
     }),
   ],
-  providers: [CustomerAuthService],
+  providers: [CustomerAuthService, AuthCustomerStrategy],
+  controllers: [CustomerAuthController],
 })
 export class CustomerAuthModule {}
