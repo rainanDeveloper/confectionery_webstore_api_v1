@@ -4,6 +4,8 @@ import { CustomerService } from 'src/customer/customer.service';
 import { JwtService } from '@nestjs/jwt';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import { hashSync } from 'bcrypt';
+import { randomBytes } from 'crypto';
+import { JwtPayloadDto } from './dtos/jwt-payload.dto';
 
 describe('CustomerAuthService', () => {
   let customerAuthService: CustomerAuthService;
@@ -38,6 +40,33 @@ describe('CustomerAuthService', () => {
     expect(customerAuthService).toBeDefined();
     expect(customerService).toBeDefined();
     expect(jwtService).toBeDefined();
+  });
+
+  describe('login', () => {
+    it('should log in a user', async () => {
+      const customerMock: CustomerEntity = {
+        login: 'RonSwanson',
+        password: '6ulYi97qf2RkwoBk',
+        email: 'ronswanson@fuckthestate.com',
+        name: 'Ron Swanson',
+      } as CustomerEntity;
+
+      const payloadMock: JwtPayloadDto = {
+        sub: customerMock.id,
+        email: customerMock.email,
+        login: customerMock.login,
+      };
+
+      const tokenMock = randomBytes(36).toString('base64');
+
+      jest.spyOn(jwtService, 'sign').mockReturnValueOnce(tokenMock);
+
+      const result = customerAuthService.login(customerMock);
+
+      expect(result).toStrictEqual({ token: tokenMock });
+      expect(jwtService.sign).toHaveBeenCalledTimes(1);
+      expect(jwtService.sign).toHaveBeenCalledWith(payloadMock);
+    });
   });
 
   describe('validateCustomer', () => {
