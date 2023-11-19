@@ -43,6 +43,19 @@ export class CustomerService {
     return finded;
   }
 
+  async findOneByLoginOrEmail(loginOrEmail: string): Promise<CustomerEntity> {
+    return this.customerRepository.findOne({
+      where: [
+        {
+          email: loginOrEmail,
+        },
+        {
+          login: loginOrEmail,
+        },
+      ],
+    });
+  }
+
   async update(id: string, customerDto: UpdateCustomerDto): Promise<string> {
     await this.findOne(id);
 
