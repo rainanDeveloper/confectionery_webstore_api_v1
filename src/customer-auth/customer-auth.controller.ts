@@ -6,6 +6,7 @@ import { LoginDto } from './dtos/login.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthCustomerStrategy } from './strategies/auth-customer.strategy';
+import { JWTokenDto } from './dtos/jwt-token.dto';
 
 @ApiTags('Customer Auth')
 @Controller('customer-auth')
@@ -20,7 +21,7 @@ export class CustomerAuthController {
   @ApiBody({
     type: LoginDto,
   })
-  async login(@Req() request: Request) {
+  login(@Req() request: Request): JWTokenDto {
     return this.customerAuthService.login(request.user as CustomerEntity);
   }
 }

@@ -4,6 +4,7 @@ import { compareSync } from 'bcrypt';
 import { CustomerService } from 'src/customer/customer.service';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import { JwtPayloadDto } from './dtos/jwt-payload.dto';
+import { JWTokenDto } from './dtos/jwt-token.dto';
 
 @Injectable()
 export class CustomerAuthService {
@@ -12,7 +13,7 @@ export class CustomerAuthService {
     @Inject(JwtService) private readonly jwtService: JwtService,
   ) {}
 
-  async login(customer: CustomerEntity) {
+  login(customer: CustomerEntity): JWTokenDto {
     const payload: JwtPayloadDto = {
       sub: customer.id,
       login: customer.login,

@@ -61,7 +61,7 @@ describe('CustomerAuthService', () => {
 
       jest.spyOn(jwtService, 'sign').mockReturnValueOnce(tokenMock);
 
-      const result = await customerAuthService.login(customerMock);
+      const result = customerAuthService.login(customerMock);
 
       expect(result).toStrictEqual({ token: tokenMock });
       expect(jwtService.sign).toHaveBeenCalledTimes(1);
