@@ -10,7 +10,9 @@ import {
 import { CustomerAddressService } from './customer-address.service';
 import { Response } from 'express';
 import { CreateCustomerAddressControllerDto } from './dtos/create-customer-address-controller.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Customer')
 @Controller('customer-address')
 export class CustomerAddressController {
   constructor(
