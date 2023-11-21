@@ -20,10 +20,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayloadDto) {
-    const user = await this.userService.findOneById(payload.sub);
-
+    let user
+    
     const unauthorizedException =
       "You're not authorized to perform this action!";
+
+    try{
+      user = await this.userService.findOneById(payload.sub);
+    }
+    catch(error) {
+      throw new UnauthorizedException(unauthorizedException)
+    }
 
     if (!user) throw new UnauthorizedException(unauthorizedException);
 
