@@ -2,15 +2,15 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomBytes, randomUUID } from 'crypto';
 import { JwtPayloadDto } from '../dtos/jwt-payload.dto';
-import { JwtStrategy } from './jwt.strategy';
-import { CustomerService } from 'src/customer/customer.service';
-import { CustomerEntity } from 'src/customer/entities/customer.entity';
+import { JwtStrategy } from './jwt-customer.strategy';
+import { UserService } from 'src/user/user.service';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { UnauthorizedException } from '@nestjs/common';
 
 describe('JwtStrategy', () => {
   let jwtStrategy: JwtStrategy;
   let configService: ConfigService;
-  let customerService: CustomerService;
+  let userService: UserService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,9 +25,9 @@ describe('JwtStrategy', () => {
           },
         },
         {
-          provide: CustomerService,
+          provide: UserService,
           useValue: {
-            findOne: jest.fn(),
+            findOneById: jest.fn(),
           },
         },
       ],
@@ -35,13 +35,13 @@ describe('JwtStrategy', () => {
 
     jwtStrategy = module.get<JwtStrategy>(JwtStrategy);
     configService = module.get<ConfigService>(ConfigService);
-    customerService = module.get<CustomerService>(CustomerService);
+    userService = module.get<UserService>(UserService);
   });
 
   it('should be defined', () => {
     expect(jwtStrategy).toBeDefined();
     expect(configService).toBeDefined();
-    expect(customerService).toBeDefined();
+    expect(userService).toBeDefined();
   });
 
   describe('validate', () => {
@@ -52,15 +52,15 @@ describe('JwtStrategy', () => {
         email: 'some@login.mail',
       };
 
-      const customerMock: CustomerEntity = {
+      const userEntityMock: UserEntity = {
         id: payloadMock.sub,
         login: payloadMock.login,
         email: payloadMock.email,
       } as any;
 
       jest
-        .spyOn(customerService, 'findOne')
-        .mockResolvedValueOnce(customerMock);
+        .spyOn(userService, 'findOneById')
+        .mockResolvedValueOnce(userEntityMock);
 
       const userMock = {
         id: payloadMock.sub,
@@ -74,10 +74,9 @@ describe('JwtStrategy', () => {
       expect(result).toEqual(userMock);
       expect(configService.getOrThrow).toHaveBeenCalledTimes(1);
       expect(configService.getOrThrow).toHaveBeenCalledWith('JWT_SECRET');
-      expect(customerService.findOne).toHaveBeenCalledTimes(1);
-      expect(customerService.findOne).toHaveBeenCalledWith(payloadMock.sub);
+      expect(userService.findOneById).toHaveBeenCalledTimes(1);
+      expect(userService.findOneById).toHaveBeenCalledWith(payloadMock.sub);
     });
-
     it('should throw a unauthorized exception', async () => {
       const payloadMock: JwtPayloadDto = {
         sub: randomUUID(),
@@ -85,15 +84,15 @@ describe('JwtStrategy', () => {
         email: 'some@login.mail',
       };
 
-      jest.spyOn(customerService, 'findOne').mockResolvedValueOnce(undefined);
+      jest.spyOn(userService, 'findOneById').mockResolvedValueOnce(undefined);
 
       const resultPromise = jwtStrategy.validate(payloadMock);
 
       expect(resultPromise).rejects.toThrowError(UnauthorizedException);
       expect(configService.getOrThrow).toHaveBeenCalledTimes(1);
       expect(configService.getOrThrow).toHaveBeenCalledWith('JWT_SECRET');
-      expect(customerService.findOne).toHaveBeenCalledTimes(1);
-      expect(customerService.findOne).toHaveBeenCalledWith(payloadMock.sub);
+      expect(userService.findOneById).toHaveBeenCalledTimes(1);
+      expect(userService.findOneById).toHaveBeenCalledWith(payloadMock.sub);
     });
 
     it('should throw a unauthorized exception', async () => {
@@ -103,27 +102,23 @@ describe('JwtStrategy', () => {
         email: 'some@login.mail',
       };
 
-      const customerMock: CustomerEntity = {
+      const userEntityMock: UserEntity = {
         id: payloadMock.sub,
         login: 'another_login',
         email: payloadMock.email,
       } as any;
 
       jest
-        .spyOn(customerService, 'findOne')
-        .mockResolvedValueOnce(customerMock);
-
-      jest
-        .spyOn(customerService, 'findOne')
-        .mockResolvedValueOnce(customerMock);
+        .spyOn(userService, 'findOneById')
+        .mockResolvedValueOnce(userEntityMock);
 
       const resultPromise = jwtStrategy.validate(payloadMock);
 
       expect(resultPromise).rejects.toThrowError(UnauthorizedException);
       expect(configService.getOrThrow).toHaveBeenCalledTimes(1);
       expect(configService.getOrThrow).toHaveBeenCalledWith('JWT_SECRET');
-      expect(customerService.findOne).toHaveBeenCalledTimes(1);
-      expect(customerService.findOne).toHaveBeenCalledWith(payloadMock.sub);
+      expect(userService.findOneById).toHaveBeenCalledTimes(1);
+      expect(userService.findOneById).toHaveBeenCalledWith(payloadMock.sub);
     });
 
     it('should throw a unauthorized exception', async () => {
@@ -133,27 +128,23 @@ describe('JwtStrategy', () => {
         email: 'some@login.mail',
       };
 
-      const customerMock: CustomerEntity = {
+      const userEntityMock: UserEntity = {
         id: payloadMock.sub,
         login: payloadMock.login,
         email: 'some_another@login.mail',
       } as any;
 
       jest
-        .spyOn(customerService, 'findOne')
-        .mockResolvedValueOnce(customerMock);
-
-      jest
-        .spyOn(customerService, 'findOne')
-        .mockResolvedValueOnce(customerMock);
+        .spyOn(userService, 'findOneById')
+        .mockResolvedValueOnce(userEntityMock);
 
       const resultPromise = jwtStrategy.validate(payloadMock);
 
       expect(resultPromise).rejects.toThrowError(UnauthorizedException);
       expect(configService.getOrThrow).toHaveBeenCalledTimes(1);
       expect(configService.getOrThrow).toHaveBeenCalledWith('JWT_SECRET');
-      expect(customerService.findOne).toHaveBeenCalledTimes(1);
-      expect(customerService.findOne).toHaveBeenCalledWith(payloadMock.sub);
+      expect(userService.findOneById).toHaveBeenCalledTimes(1);
+      expect(userService.findOneById).toHaveBeenCalledWith(payloadMock.sub);
     });
   });
 });

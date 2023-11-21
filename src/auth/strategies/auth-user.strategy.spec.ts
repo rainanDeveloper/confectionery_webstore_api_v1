@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { AuthService } from '../auth.service';
-import { LocalStrategy } from './local.strategy';
+import { LocalStrategy } from './auth-user.strategy';
 
 describe('LocalStrategy', () => {
   let localStrategy: LocalStrategy;
