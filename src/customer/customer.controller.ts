@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -20,7 +21,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { NotFoundErrorDto } from 'src/helpers/not_found_error.helpers';
 import { ValidationErrorDto } from 'src/helpers/validation.helpers';
 import { CustomerService } from './customer.service';
@@ -55,7 +56,7 @@ export class CustomerController {
     response.header('location', getUrl).status(HttpStatus.CREATED).send();
   }
 
-  @Get(':id')
+  @Get()
   @ApiOkResponse({
     description: 'OK: Finded a customer sucessfully and returned it',
     type: GetCustomerDto,
@@ -66,11 +67,12 @@ export class CustomerController {
   })
   @UseGuards(AuthGuard('customer-jwt'))
   @ApiBearerAuth()
-  async findOne(@Param('id') id: string) {
-    return await this.customerService.findOne(id);
+  async findOne(@Req() request: Request) {
+    const user = request.user as any;
+    return await this.customerService.findOne(user.id);
   }
 
-  @Patch(':id')
+  @Patch()
   @ApiNoContentResponse({
     description: 'NO CONTENT: Customer updated sucessfully',
   })
@@ -81,18 +83,20 @@ export class CustomerController {
   @UseGuards(AuthGuard('customer-jwt'))
   @ApiBearerAuth()
   async update(
-    @Param('id') id: string,
+    @Req() request: Request,
     @Body() customerDto: UpdateCustomerDto,
     @Res() response: Response,
   ) {
-    await this.customerService.update(id, customerDto);
-    const getUrl = `customer/${id}`;
+    const user = request.user as any;
+
+    await this.customerService.update(user.id, customerDto);
+    const getUrl = `customer/${user.id}`;
 
     response.header('location', getUrl).status(HttpStatus.NO_CONTENT).send();
     return;
   }
 
-  @Delete(':id')
+  @Delete()
   @ApiNoContentResponse({
     description: 'NO CONTENT: Customer deleted sucessfully',
   })
@@ -102,8 +106,10 @@ export class CustomerController {
   })
   @UseGuards(AuthGuard('customer-jwt'))
   @ApiBearerAuth()
-  async delete(@Param('id') id: string) {
-    await this.customerService.delete(id);
+  async delete(@Req() request: Request) {
+    const user = request.user as any;
+
+    await this.customerService.delete(user.id);
 
     return;
   }
