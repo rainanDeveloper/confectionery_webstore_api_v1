@@ -39,6 +39,14 @@ describe('CustomerAddressController', () => {
   describe('create', () => {
     it('should create a customer address for informed customer', async () => {
       const customerMockId = randomUUID();
+
+      const userMock = {
+        id: customerMockId
+      }
+      const requestMock = {
+        user: userMock,
+      } as any
+
       const sendMock = jest.fn().mockReturnValue(undefined);
       const statusMock = jest.fn().mockImplementation((_status: number) => {
         return {
@@ -67,8 +75,8 @@ describe('CustomerAddressController', () => {
         .mockResolvedValueOnce(customerAddresMockId);
 
       const result = await customerAddressController.create(
-        customerMockId,
         createCustomerAddressDto,
+        requestMock,
         responseMock,
       );
 
