@@ -6,14 +6,18 @@ import {
   Param,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { CustomerAddressService } from './customer-address.service';
 import { Response } from 'express';
 import { CreateCustomerAddressControllerDto } from './dtos/create-customer-address-controller.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
-@ApiTags('Customer')
+@ApiTags('Customer Address')
 @Controller('customer-address')
+@UseGuards(AuthGuard('customer-jwt'))
+@ApiBearerAuth()
 export class CustomerAddressController {
   constructor(
     @Inject(CustomerAddressService)

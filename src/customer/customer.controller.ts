@@ -9,9 +9,11 @@ import {
   Patch,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -25,6 +27,7 @@ import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { GetCustomerDto } from './dtos/get-customer.dto';
 import { UpdateCustomerDto } from './dtos/update-customer.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Customer')
 @Controller('customer')
@@ -61,6 +64,8 @@ export class CustomerController {
     description: "NOT FOUND: customer with informed id wasn't found",
     type: NotFoundErrorDto,
   })
+  @UseGuards(AuthGuard('customer-jwt'))
+  @ApiBearerAuth()
   async findOne(@Param('id') id: string) {
     return await this.customerService.findOne(id);
   }
@@ -73,6 +78,8 @@ export class CustomerController {
     description: "NOT FOUND: customer with informed id wasn't found",
     type: NotFoundErrorDto,
   })
+  @UseGuards(AuthGuard('customer-jwt'))
+  @ApiBearerAuth()
   async update(
     @Param('id') id: string,
     @Body() customerDto: UpdateCustomerDto,
@@ -93,6 +100,8 @@ export class CustomerController {
     description: "NOT FOUND: customer with informed id wasn't found",
     type: NotFoundErrorDto,
   })
+  @UseGuards(AuthGuard('customer-jwt'))
+  @ApiBearerAuth()
   async delete(@Param('id') id: string) {
     await this.customerService.delete(id);
 

@@ -5,7 +5,6 @@ import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import { LoginDto } from './dtos/login.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthCustomerStrategy } from './strategies/auth-customer.strategy';
 import { JWTokenDto } from './dtos/jwt-token.dto';
 
 @ApiTags('Customer Auth')
