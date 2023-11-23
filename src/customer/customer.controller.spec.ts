@@ -97,11 +97,17 @@ describe('CustomerController', () => {
     it('should find a customer successfully', async () => {
       const customerId = randomUUID();
 
+      const requestMock = {
+        user: {
+          id: customerId
+        }
+      } as any
+
       jest
         .spyOn(customerService, 'findOne')
         .mockResolvedValueOnce(customerMock);
 
-      const result = await customerController.findOne(customerId);
+      const result = await customerController.findOne(requestMock);
 
       expect(result).toStrictEqual(customerMock);
       expect(customerService.findOne).toHaveBeenCalledTimes(1);
@@ -124,13 +130,18 @@ describe('CustomerController', () => {
       } as any;
 
       const customerId = randomUUID();
+      const requestMock = {
+        user: {
+          id: customerId
+        }
+      } as any
 
       const updateCustomerDto: UpdateCustomerDto = {
         name: 'Some New name',
       };
 
       const result = await customerController.update(
-        customerId,
+        requestMock,
         updateCustomerDto,
         responseMock,
       );
@@ -149,7 +160,13 @@ describe('CustomerController', () => {
     it('should delete a customer successfully', async () => {
       const customerId = randomUUID();
 
-      const result = await customerController.delete(customerId);
+      const requestMock = {
+        user: {
+          id: customerId
+        }
+      } as any
+
+      const result = await customerController.delete(requestMock);
 
       expect(result).toBeUndefined();
       expect(customerService.delete).toHaveBeenCalledTimes(1);

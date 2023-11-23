@@ -24,19 +24,36 @@ export class CustomerAddressService {
     return createdCustomerAddress.id;
   }
 
-  async findOne(id: string): Promise<CustomerAddressEntity> {
+  async findAll(customerId: string): Promise<CustomerAddressEntity[]> {
+    return this.customerAddressRepository.find({
+      where: {
+        customer: {
+          id: customerId,
+        },
+      },
+    });
+  }
+
+  async findOne(
+    customerId: string,
+    id: string,
+  ): Promise<CustomerAddressEntity> {
     return this.customerAddressRepository.findOne({
       where: {
+        customer: {
+          id: customerId,
+        },
         id,
       },
     });
   }
 
   async update(
+    customerId,
     id: string,
     updateCustomerAddressDto: UpdateCustomerAddressDto,
   ): Promise<string> {
-    const finded = await this.findOne(id);
+    const finded = await this.findOne(customerId, id);
     if (!finded) {
       throw new NotFoundException(`Customer address ${id} wasn't found!`);
     }
@@ -49,8 +66,8 @@ export class CustomerAddressService {
     return id;
   }
 
-  async delete(id: string): Promise<string> {
-    const finded = await this.findOne(id);
+  async delete(customerId: string, id: string): Promise<string> {
+    const finded = await this.findOne(customerId, id);
     if (!finded) {
       throw new NotFoundException(`Customer address ${id} wasn't found!`);
     }
