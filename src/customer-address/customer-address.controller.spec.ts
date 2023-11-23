@@ -40,6 +40,7 @@ describe('CustomerAddressController', () => {
           provide: CustomerAddressService,
           useValue: {
             create: jest.fn(),
+            findAll: jest.fn(),
           },
         },
       ],
@@ -127,7 +128,7 @@ describe('CustomerAddressController', () => {
       } as any;
 
       jest
-        .spyOn(customerAddressController, 'findAll')
+        .spyOn(customerAddressService, 'findAll')
         .mockResolvedValueOnce([customerAddressEntityMock]);
 
       const result = await customerAddressController.findAll(requestMock);
