@@ -88,7 +88,7 @@ export class CustomerAddressController {
 
     const getUrl = `customer-address/${user.id}/${id}`;
 
-    response.header('location', getUrl).status(HttpStatus.NOT_FOUND).send();
+    response.header('location', getUrl).status(HttpStatus.NO_CONTENT).send();
     return;
   }
 }

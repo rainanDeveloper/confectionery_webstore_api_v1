@@ -6,6 +6,7 @@ import { CreateCustomerAddressDto } from './dtos/create-customer-address.dto';
 import { CreateCustomerAddressControllerDto } from './dtos/create-customer-address-controller.dto';
 import { HttpStatus } from '@nestjs/common';
 import { CustomerAddressEntity } from './entities/customer-address.entity';
+import { UpdateCustomerAddressDto } from './dtos/update-customer-address.dto';
 
 describe('CustomerAddressController', () => {
   let customerAddressController: CustomerAddressController;
@@ -42,6 +43,7 @@ describe('CustomerAddressController', () => {
             create: jest.fn(),
             findAll: jest.fn(),
             findOne: jest.fn(),
+            update: jest.fn(),
           },
         },
       ],
@@ -171,9 +173,55 @@ describe('CustomerAddressController', () => {
 
   describe('update', () => {
     it('should update a customer address', async () => {
-      // Arrange
-      // Act
-      // Assert
+      const customerMockId = randomUUID();
+
+      const userMock = {
+        id: customerMockId,
+      };
+      const requestMock = {
+        user: userMock,
+      } as any;
+
+      const sendMock = jest.fn().mockReturnValue(undefined);
+      const statusMock = jest.fn().mockImplementation((_status: number) => {
+        return {
+          send: sendMock,
+        };
+      });
+      const headerMock = jest.fn().mockReturnValue({ status: statusMock });
+
+      const responseMock = {
+        header: headerMock,
+      } as any;
+
+      const updateCustomerAddressDto: UpdateCustomerAddressDto = {
+        zipCode: '45347120',
+      };
+
+      const customerAddresMockId = randomUUID();
+
+      jest
+        .spyOn(customerAddressService, 'update')
+        .mockResolvedValueOnce(customerAddresMockId);
+
+      const result = await customerAddressController.update(
+        requestMock,
+        customerAddresMockId,
+        updateCustomerAddressDto,
+        responseMock,
+      );
+
+      expect(result).toBeUndefined();
+      expect(customerAddressService.update).toHaveBeenCalledTimes(1);
+      expect(headerMock).toHaveBeenCalledTimes(1);
+      expect(headerMock).toHaveBeenCalledWith(
+        'location',
+        `customer-address/${customerMockId}/${customerAddresMockId}`,
+      );
+      expect(statusMock).toHaveBeenCalledTimes(1);
+      expect(statusMock).toHaveBeenCalledWith(HttpStatus.NO_CONTENT);
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      expect(sendMock).toHaveBeenCalledWith();
     });
   });
 });
