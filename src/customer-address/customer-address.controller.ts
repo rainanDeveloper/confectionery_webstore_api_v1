@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Inject,
   Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -59,5 +60,12 @@ export class CustomerAddressController {
     const user = request.user as any;
 
     return this.customerAddressService.findAll(user.id);
+  }
+
+  @Get(':id')
+  async findOne(@Req() request: Request, @Param('id') id: string) {
+    const user = request.user as any;
+
+    return this.customerAddressService.findOne(user.id, id);
   }
 }

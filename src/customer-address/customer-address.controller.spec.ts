@@ -41,6 +41,7 @@ describe('CustomerAddressController', () => {
           useValue: {
             create: jest.fn(),
             findAll: jest.fn(),
+            findOne: jest.fn(),
           },
         },
       ],
@@ -136,6 +137,35 @@ describe('CustomerAddressController', () => {
       expect(result).toStrictEqual([customerAddressEntityMock]);
       expect(customerAddressService.findAll).toHaveBeenCalledTimes(1);
       expect(customerAddressService.findAll).toHaveBeenCalledWith(customerId);
+    });
+  });
+
+  describe('findOne', () => {
+    it('should find a customer address', async () => {
+      const customerId = randomUUID();
+      const customerAddresId = randomUUID();
+
+      const requestMock = {
+        user: {
+          id: customerId,
+        },
+      } as any;
+
+      jest
+        .spyOn(customerAddressService, 'findOne')
+        .mockResolvedValueOnce(customerAddressEntityMock);
+
+      const request = await customerAddressController.findOne(
+        requestMock,
+        customerAddresId,
+      );
+
+      expect(request).toStrictEqual(customerAddressEntityMock);
+      expect(customerAddressService.findOne).toHaveBeenCalledTimes(1);
+      expect(customerAddressService.findOne).toHaveBeenCalledWith(
+        customerId,
+        customerAddresId,
+      );
     });
   });
 });
