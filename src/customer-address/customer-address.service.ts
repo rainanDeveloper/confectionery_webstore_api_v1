@@ -24,6 +24,16 @@ export class CustomerAddressService {
     return createdCustomerAddress.id;
   }
 
+  async findAll(customerId: string): Promise<CustomerAddressEntity[]> {
+    return this.customerAddressRepository.find({
+      where: {
+        customer: {
+          id: customerId,
+        },
+      },
+    });
+  }
+
   async findOne(id: string): Promise<CustomerAddressEntity> {
     return this.customerAddressRepository.findOne({
       where: {

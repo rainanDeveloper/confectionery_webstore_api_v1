@@ -42,6 +42,7 @@ describe('CustomerAddressService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            find: jest.fn(),
             findOne: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -82,6 +83,28 @@ describe('CustomerAddressService', () => {
       expect(customerAddressRepository.save).toHaveBeenCalledWith(
         customerAddressEntityMock,
       );
+    });
+  });
+
+  describe('findAll', () => {
+    it('should find all addresses for a specific customer', async () => {
+      const customerId = customerAddressEntityMock.id;
+
+      jest
+        .spyOn(customerAddressRepository, 'find')
+        .mockResolvedValueOnce([customerAddressEntityMock]);
+
+      const result = await customerAddressService.findAll(customerId);
+
+      expect(result).toStrictEqual([customerAddressEntityMock]);
+      expect(customerAddressRepository.find).toHaveBeenCalledTimes(1);
+      expect(customerAddressRepository.find).toHaveBeenCalledWith({
+        where: {
+          customer: {
+            id: customerId,
+          },
+        },
+      });
     });
   });
 
