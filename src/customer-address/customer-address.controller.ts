@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Inject,
   Param,
@@ -15,7 +16,7 @@ import { Request, Response } from 'express';
 import { CreateCustomerAddressControllerDto } from './dtos/create-customer-address-controller.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { request } from 'http';
+import { CustomerAddressEntity } from './entities/customer-address.entity';
 
 @ApiTags('Customer Address')
 @Controller('customer-address')
@@ -35,7 +36,10 @@ export class CustomerAddressController {
   ) {
     const user = request.user as any;
 
-    if(!user) throw new UnauthorizedException('You\'re not allowed to perform this action')
+    if (!user)
+      throw new UnauthorizedException(
+        "You're not allowed to perform this action",
+      );
     const customerAddresId = await this.customerAddressService.create({
       ...createCustomerAddressDto,
       customer: {
@@ -48,5 +52,12 @@ export class CustomerAddressController {
     response.header('location', getUrl).status(HttpStatus.CREATED).send();
 
     return;
+  }
+
+  @Get()
+  async findAll(@Req() request: Request): Promise<CustomerAddressEntity[]> {
+    const user = request.user as any;
+
+    return this.customerAddressService.findAll(user.id);
   }
 }
