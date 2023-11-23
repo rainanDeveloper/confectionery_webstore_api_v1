@@ -110,11 +110,13 @@ describe('CustomerAddressService', () => {
 
   describe('findOne', () => {
     it('should find a customer address sucessfully ', async () => {
+      const customerId = randomUUID();
       jest
         .spyOn(customerAddressRepository, 'findOne')
         .mockResolvedValueOnce(customerAddressEntityMock);
 
       const result = await customerAddressService.findOne(
+        customerId,
         customerAddressIdMock,
       );
 
@@ -123,6 +125,9 @@ describe('CustomerAddressService', () => {
       expect(customerAddressRepository.findOne).toHaveBeenCalledWith({
         where: {
           id: customerAddressIdMock,
+          customer: {
+            id: customerId,
+          },
         },
       });
     });
@@ -130,6 +135,7 @@ describe('CustomerAddressService', () => {
 
   describe('update', () => {
     it('should update a customer address successfully', async () => {
+      const customerId = randomUUID();
       jest
         .spyOn(customerAddressService, 'findOne')
         .mockResolvedValueOnce(customerAddressEntityMock);
@@ -138,6 +144,7 @@ describe('CustomerAddressService', () => {
       };
 
       const result = await customerAddressService.update(
+        customerId,
         customerAddressIdMock,
         updateCustomerAddressDto,
       );
@@ -145,6 +152,7 @@ describe('CustomerAddressService', () => {
       expect(result).toStrictEqual(customerAddressIdMock);
       expect(customerAddressService.findOne).toHaveBeenCalledTimes(1);
       expect(customerAddressService.findOne).toHaveBeenCalledWith(
+        customerId,
         customerAddressIdMock,
       );
       expect(customerAddressRepository.update).toHaveBeenCalledTimes(1);
@@ -157,12 +165,14 @@ describe('CustomerAddressService', () => {
     });
 
     it('should return a not found error', async () => {
+      const customerId = randomUUID();
       jest.spyOn(customerAddressService, 'findOne').mockResolvedValueOnce(null);
       const updateCustomerAddressDto: UpdateCustomerAddressDto = {
         city: 'BA',
       };
 
       const resultPromise = customerAddressService.update(
+        customerId,
         customerAddressIdMock,
         updateCustomerAddressDto,
       );
@@ -170,6 +180,7 @@ describe('CustomerAddressService', () => {
       expect(resultPromise).rejects.toThrow(NotFoundException);
       expect(customerAddressService.findOne).toHaveBeenCalledTimes(1);
       expect(customerAddressService.findOne).toHaveBeenCalledWith(
+        customerId,
         customerAddressIdMock,
       );
       expect(customerAddressRepository.update).not.toHaveBeenCalled();
@@ -178,15 +189,20 @@ describe('CustomerAddressService', () => {
 
   describe('delete', () => {
     it('should delete a customer address successfully', async () => {
+      const customerId = randomUUID();
       jest
         .spyOn(customerAddressService, 'findOne')
         .mockResolvedValueOnce(customerAddressEntityMock);
 
-      const result = await customerAddressService.delete(customerAddressIdMock);
+      const result = await customerAddressService.delete(
+        customerId,
+        customerAddressIdMock,
+      );
 
       expect(result).toStrictEqual(customerAddressIdMock);
       expect(customerAddressService.findOne).toHaveBeenCalledTimes(1);
       expect(customerAddressService.findOne).toHaveBeenCalledWith(
+        customerId,
         customerAddressIdMock,
       );
       expect(customerAddressRepository.delete).toHaveBeenCalledTimes(1);
@@ -196,18 +212,18 @@ describe('CustomerAddressService', () => {
     });
 
     it('should return a not found error', async () => {
+      const customerId = randomUUID();
       jest.spyOn(customerAddressService, 'findOne').mockResolvedValueOnce(null);
-      const updateCustomerAddressDto: UpdateCustomerAddressDto = {
-        city: 'BA',
-      };
 
       const resultPromise = customerAddressService.delete(
+        customerId,
         customerAddressIdMock,
       );
 
       expect(resultPromise).rejects.toThrow(NotFoundException);
       expect(customerAddressService.findOne).toHaveBeenCalledTimes(1);
       expect(customerAddressService.findOne).toHaveBeenCalledWith(
+        customerId,
         customerAddressIdMock,
       );
       expect(customerAddressRepository.delete).not.toHaveBeenCalled();
