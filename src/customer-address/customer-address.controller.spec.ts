@@ -168,4 +168,12 @@ describe('CustomerAddressController', () => {
       );
     });
   });
+
+  describe('update', () => {
+    it('should update a customer address', async () => {
+      // Arrange
+      // Act
+      // Assert
+    });
+  });
 });

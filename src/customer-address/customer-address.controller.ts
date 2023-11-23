@@ -18,6 +18,9 @@ import { CreateCustomerAddressControllerDto } from './dtos/create-customer-addre
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { CustomerAddressEntity } from './entities/customer-address.entity';
+import { request } from 'http';
+import { CreateCustomerAddressDto } from './dtos/create-customer-address.dto';
+import { UpdateCustomerAddressDto } from './dtos/update-customer-address.dto';
 
 @ApiTags('Customer Address')
 @Controller('customer-address')
@@ -67,5 +70,25 @@ export class CustomerAddressController {
     const user = request.user as any;
 
     return this.customerAddressService.findOne(user.id, id);
+  }
+
+  @Patch(':id')
+  async update(
+    @Req() request,
+    @Param('id') id: string,
+    @Body() updateCustomerAddressDto: UpdateCustomerAddressDto,
+    @Res() response: Response,
+  ) {
+    const user = request.user as any;
+    await this.customerAddressService.update(
+      user.id,
+      id,
+      updateCustomerAddressDto,
+    );
+
+    const getUrl = `customer-address/${user.id}/${id}`;
+
+    response.header('location', getUrl).status(HttpStatus.NOT_FOUND).send();
+    return;
   }
 }
