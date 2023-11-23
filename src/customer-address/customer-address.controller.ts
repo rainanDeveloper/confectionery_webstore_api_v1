@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Inject,
@@ -51,7 +52,7 @@ export class CustomerAddressController {
       },
     });
 
-    const getUrl = `customer-address/${user.id}/${customerAddresId}`;
+    const getUrl = `customer-address/${customerAddresId}`;
 
     response.header('location', getUrl).status(HttpStatus.CREATED).send();
 
@@ -86,9 +87,23 @@ export class CustomerAddressController {
       updateCustomerAddressDto,
     );
 
-    const getUrl = `customer-address/${user.id}/${id}`;
+    const getUrl = `customer-address/${id}`;
 
     response.header('location', getUrl).status(HttpStatus.NO_CONTENT).send();
+    return;
+  }
+
+  @Delete(':id')
+  async delete(
+    @Req() request,
+    @Param('id') id: string,
+    @Res() response: Response,
+  ) {
+    const user = request.user as any;
+    await this.customerAddressService.delete(user.id, id);
+
+    response.status(HttpStatus.NO_CONTENT).send();
+
     return;
   }
 }

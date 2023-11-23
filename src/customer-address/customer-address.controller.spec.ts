@@ -44,6 +44,7 @@ describe('CustomerAddressController', () => {
             findAll: jest.fn(),
             findOne: jest.fn(),
             update: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -111,7 +112,7 @@ describe('CustomerAddressController', () => {
       expect(headerMock).toHaveBeenCalledTimes(1);
       expect(headerMock).toHaveBeenCalledWith(
         'location',
-        `customer-address/${customerMockId}/${customerAddresMockId}`,
+        `customer-address/${customerAddresMockId}`,
       );
       expect(statusMock).toHaveBeenCalledTimes(1);
       expect(statusMock).toHaveBeenCalledWith(HttpStatus.CREATED);
@@ -216,8 +217,51 @@ describe('CustomerAddressController', () => {
       expect(headerMock).toHaveBeenCalledTimes(1);
       expect(headerMock).toHaveBeenCalledWith(
         'location',
-        `customer-address/${customerMockId}/${customerAddresMockId}`,
+        `customer-address/${customerAddresMockId}`,
       );
+      expect(statusMock).toHaveBeenCalledTimes(1);
+      expect(statusMock).toHaveBeenCalledWith(HttpStatus.NO_CONTENT);
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      expect(sendMock).toHaveBeenCalledWith();
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a customer successfully', async () => {
+      const customerMockId = randomUUID();
+
+      const userMock = {
+        id: customerMockId,
+      };
+      const requestMock = {
+        user: userMock,
+      } as any;
+
+      const sendMock = jest.fn().mockReturnValue(undefined);
+      const statusMock = jest.fn().mockImplementation((_status: number) => {
+        return {
+          send: sendMock,
+        };
+      });
+
+      const responseMock = {
+        status: statusMock,
+      } as any;
+
+      const customerAddresMockId = randomUUID();
+
+      jest
+        .spyOn(customerAddressService, 'delete')
+        .mockResolvedValueOnce(customerAddresMockId);
+
+      const result = await customerAddressController.delete(
+        requestMock,
+        customerAddresMockId,
+        responseMock,
+      );
+
+      expect(result).toBeUndefined();
+      expect(customerAddressService.update).toHaveBeenCalledTimes(1);
       expect(statusMock).toHaveBeenCalledTimes(1);
       expect(statusMock).toHaveBeenCalledWith(HttpStatus.NO_CONTENT);
       expect(sendMock).toHaveBeenCalledTimes(1);
