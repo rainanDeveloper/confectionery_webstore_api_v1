@@ -39,7 +39,7 @@ export class ProductController {
 
     const getUrl = `product/${productId}`;
 
-    response.header('location', getUrl).status(HttpStatus.CREATED);
+    response.header('location', getUrl).status(HttpStatus.CREATED).send();
 
     return;
   }
