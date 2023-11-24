@@ -3,11 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Inject,
   Param,
   Patch,
   Post,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -17,6 +19,7 @@ import { SearchProductDto } from './dtos/search-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ProductService } from './product.service';
+import { Response } from 'express';
 
 @ApiTags('Products')
 @Controller('product')
@@ -28,8 +31,17 @@ export class ProductController {
   @Post()
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  async create(@Body() productDto: CreateProductDto): Promise<ProductEntity> {
-    return this.productService.create(productDto);
+  async create(
+    @Res() request: Response,
+    @Body() productDto: CreateProductDto,
+  ): Promise<undefined> {
+    const productId = await this.productService.create(productDto);
+
+    const getUrl = `product/${productId}`;
+
+    request.header('location', getUrl).status(HttpStatus.CREATED);
+
+    return;
   }
 
   @Patch(':id')
