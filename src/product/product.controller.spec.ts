@@ -7,6 +7,7 @@ import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
+import { HttpStatus } from '@nestjs/common';
 
 describe('ProductController', () => {
   let productController: ProductController;
@@ -39,7 +40,7 @@ describe('ProductController', () => {
 
   describe('create', () => {
     it('should create a product successfully', async () => {
-      const productMock = new ProductEntity();
+      const productMockId = randomUUID();
 
       const productDto: CreateProductDto = {
         title: 'some product',
@@ -48,13 +49,34 @@ describe('ProductController', () => {
         unitValue: 30,
       };
 
-      jest.spyOn(productService, 'create').mockResolvedValueOnce(productMock);
+      const sendMock = jest.fn().mockReturnValue(undefined);
+      const statusMock = jest.fn().mockImplementation((_status: number) => {
+        return {
+          send: sendMock,
+        };
+      });
+      const headerMock = jest.fn().mockReturnValue({ status: statusMock });
 
-      const result = await productController.create(productDto);
+      const responseMock = {
+        header: headerMock,
+      } as any;
 
-      expect(result).toStrictEqual(productMock);
+      jest.spyOn(productService, 'create').mockResolvedValueOnce(productMockId);
+
+      const result = await productController.create(responseMock, productDto);
+
+      expect(result).toBeUndefined();
       expect(productService.create).toHaveBeenCalledTimes(1);
       expect(productService.create).toHaveBeenCalledWith(productDto);
+      expect(headerMock).toHaveBeenCalledTimes(1);
+      expect(headerMock).toHaveBeenCalledWith(
+        'location',
+        `product/${productMockId}`,
+      );
+      expect(statusMock).toHaveBeenCalledTimes(1);
+      expect(statusMock).toHaveBeenCalledWith(HttpStatus.CREATED);
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      expect(sendMock).toHaveBeenCalledWith();
     });
   });
 

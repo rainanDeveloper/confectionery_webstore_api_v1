@@ -32,14 +32,14 @@ export class ProductController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   async create(
-    @Res() request: Response,
+    @Res() response: Response,
     @Body() productDto: CreateProductDto,
   ): Promise<undefined> {
     const productId = await this.productService.create(productDto);
 
     const getUrl = `product/${productId}`;
 
-    request.header('location', getUrl).status(HttpStatus.CREATED);
+    response.header('location', getUrl).status(HttpStatus.CREATED);
 
     return;
   }
