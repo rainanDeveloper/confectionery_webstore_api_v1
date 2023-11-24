@@ -60,6 +60,7 @@ describe('ProductService', () => {
 
       const productMock = new ProductEntity();
 
+      productMock.id = randomUUID();
       productMock.title = productDto.title;
       productMock.description = productDto.description;
       productMock.cost = productDto.cost;
@@ -72,7 +73,7 @@ describe('ProductService', () => {
       const newProduct = await productService.create(productDto);
 
       expect(newProduct).toBeDefined();
-      expect(newProduct).toStrictEqual(productMock);
+      expect(newProduct).toStrictEqual(productMock.id);
       expect(productRepository.create).toHaveBeenCalledTimes(1);
       expect(productRepository.create).toHaveBeenCalledWith(productDto);
       expect(productRepository.save).toHaveBeenCalledTimes(1);

@@ -19,8 +19,6 @@ import { CreateCustomerAddressControllerDto } from './dtos/create-customer-addre
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { CustomerAddressEntity } from './entities/customer-address.entity';
-import { request } from 'http';
-import { CreateCustomerAddressDto } from './dtos/create-customer-address.dto';
 import { UpdateCustomerAddressDto } from './dtos/update-customer-address.dto';
 
 @ApiTags('Customer Address')

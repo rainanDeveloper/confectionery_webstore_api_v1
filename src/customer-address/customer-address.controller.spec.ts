@@ -261,7 +261,7 @@ describe('CustomerAddressController', () => {
       );
 
       expect(result).toBeUndefined();
-      expect(customerAddressService.update).toHaveBeenCalledTimes(1);
+      expect(customerAddressService.delete).toHaveBeenCalledTimes(1);
       expect(statusMock).toHaveBeenCalledTimes(1);
       expect(statusMock).toHaveBeenCalledWith(HttpStatus.NO_CONTENT);
       expect(sendMock).toHaveBeenCalledTimes(1);

@@ -20,12 +20,12 @@ export class ProductService {
       parseInt(this.configService.get('PAGINATION_AMOUNT')) || 100;
   }
 
-  async create(createProductDto: CreateProductDto): Promise<ProductEntity> {
+  async create(createProductDto: CreateProductDto): Promise<string> {
     const product = this.productRepository.create(createProductDto);
 
     await this.productRepository.save(product);
 
-    return product;
+    return product.id;
   }
 
   async findAll(page = 1): Promise<ProductEntity[]> {
