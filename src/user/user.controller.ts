@@ -3,10 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Inject,
   Param,
   Patch,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -23,6 +25,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserBodyResponseDto } from './dtos/user-body-response.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserService } from './user.service';
+import { Response } from 'express';
 
 @Controller('user')
 @ApiTags('User')
@@ -37,8 +40,16 @@ export class UserController {
   })
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()
-  async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
-    return await this.userService.create(createUserDto);
+  async create(
+    @Res() response: Response,
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<undefined> {
+    const userId = await this.userService.create(createUserDto);
+
+    const getUrl = `user/${userId}`;
+
+    response.header('location', getUrl).status(HttpStatus.CREATED).send();
+    return;
   }
 
   @Get()

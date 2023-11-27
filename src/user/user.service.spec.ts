@@ -63,7 +63,7 @@ describe('UserService', () => {
       const result = await userService.create(createUserDto);
 
       expect(result).not.toBeNull();
-      expect(result).toBeDefined();
+      expect(result).toStrictEqual(userMock.id);
       expect(userRepository.create).toHaveBeenCalledWith(createUserDto);
       expect(userRepository.create).toHaveBeenCalledTimes(1);
       expect(userRepository.save).toHaveBeenCalledWith(userMock);
