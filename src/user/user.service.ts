@@ -16,7 +16,7 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+  async create(createUserDto: CreateUserDto): Promise<string> {
     const newUser = this.userRepository.create(createUserDto);
 
     try {
@@ -25,7 +25,7 @@ export class UserService {
       throw new BadRequestException(error?.message);
     }
 
-    return newUser;
+    return newUser.id;
   }
   async findAll(): Promise<UserEntity[]> {
     return await this.userRepository.find({

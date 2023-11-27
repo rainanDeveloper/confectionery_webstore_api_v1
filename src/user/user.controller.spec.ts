@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { HttpStatus } from '@nestjs/common';
 
 describe('UserController', () => {
   let userController: UserController;
@@ -44,19 +45,33 @@ describe('UserController', () => {
         password: 'S0m3T3stP4ss',
       };
 
-      const mockUser: UserEntity = {
-        id: randomUUID(),
-        ...createUserDto,
-      } as UserEntity;
+      const mockUserId = randomUUID();
 
-      jest.spyOn(userService, 'create').mockResolvedValueOnce(mockUser);
+      const sendMock = jest.fn().mockReturnValue(undefined);
+      const statusMock = jest.fn().mockImplementation((_status: number) => {
+        return {
+          send: sendMock,
+        };
+      });
+      const headerMock = jest.fn().mockReturnValue({ status: statusMock });
 
-      const created = await userController.create(createUserDto);
+      const responseMock = {
+        header: headerMock,
+      } as any;
 
-      expect(created).toBeDefined();
-      expect(created).toEqual(mockUser);
+      jest.spyOn(userService, 'create').mockResolvedValueOnce(mockUserId);
+
+      const created = await userController.create(responseMock, createUserDto);
+
+      expect(created).toBeUndefined();
       expect(userService.create).toHaveBeenCalledTimes(1);
       expect(userService.create).toHaveBeenCalledWith(createUserDto);
+      expect(headerMock).toHaveBeenCalledTimes(1);
+      expect(headerMock).toHaveBeenCalledWith('location', `user/${mockUserId}`);
+      expect(statusMock).toHaveBeenCalledTimes(1);
+      expect(statusMock).toHaveBeenCalledWith(HttpStatus.CREATED);
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      expect(sendMock).toHaveBeenCalledWith();
     });
   });
 
