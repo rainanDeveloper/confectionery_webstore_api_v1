@@ -3,10 +3,12 @@ import {
   Column,
   CreateDateColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { CartStatus } from '../enums/cart-status.enum';
+import { CartItemEntity } from 'src/cart-item/entities/cart-item.entity';
 
 export class CartEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -14,6 +16,9 @@ export class CartEntity {
 
   @ManyToOne(() => CustomerEntity)
   customer: CustomerEntity;
+
+  @OneToMany(() => CartItemEntity, (item) => item.cart)
+  itens: CartItemEntity[];
 
   @Column({
     name: 'total',
