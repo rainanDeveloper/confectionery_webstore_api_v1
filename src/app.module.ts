@@ -13,6 +13,8 @@ import { OrderItemModule } from './order-item/order-item.module';
 import { CustomerModule } from './customer/customer.module';
 import { CustomerAddressModule } from './customer-address/customer-address.module';
 import { CustomerAuthModule } from './customer-auth/customer-auth.module';
+import { CartModule } from './cart/cart.module';
+import { CartItemModule } from './cart-item/cart-item.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { CustomerAuthModule } from './customer-auth/customer-auth.module';
     CustomerModule,
     CustomerAddressModule,
     CustomerAuthModule,
+    CartModule,
+    CartItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],
