@@ -29,4 +29,12 @@ describe('CartService', () => {
     expect(cartService).toBeDefined();
     expect(cartRepository).toBeDefined();
   });
+
+  describe('create', () => {
+    it('should create a new cart', async () => {
+      // Arrange
+      // Act
+      // Assert
+    });
+  });
 });
