@@ -63,6 +63,24 @@ export class ProductEntity {
   })
   categories: CategoryEntity[];
 
+  @Column({
+    name: 'stock_amount',
+    type: 'decimal',
+    precision: 4,
+    nullable: false,
+    default: 0,
+  })
+  stockAmount: number;
+
+  @Column({
+    name: 'stock_reserved_amount',
+    type: 'decimal',
+    precision: 4,
+    nullable: false,
+    default: 0,
+  })
+  stockReservedAmount: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
