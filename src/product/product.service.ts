@@ -40,6 +40,10 @@ export class ProductService {
     });
   }
 
+  async findOne(id: string): Promise<ProductEntity> {
+    return;
+  }
+
   async search(searchDto: SearchProductDto): Promise<ProductEntity[]> {
     const skip = (searchDto.page - 1) * this.paginationAmount;
     const take = this.paginationAmount;
