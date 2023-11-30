@@ -41,7 +41,11 @@ export class ProductService {
   }
 
   async findOne(id: string): Promise<ProductEntity> {
-    return;
+    return this.productRepository.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
   async search(searchDto: SearchProductDto): Promise<ProductEntity[]> {

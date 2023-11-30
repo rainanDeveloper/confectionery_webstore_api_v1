@@ -98,6 +98,27 @@ describe('ProductService', () => {
 
       expect(result).toStrictEqual(productMock);
       expect(productRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: productId,
+        },
+      });
+    });
+
+    it('should return a undefined when no product is finded', async () => {
+      const productId = randomUUID();
+
+      jest.spyOn(productRepository, 'findOne').mockResolvedValueOnce(undefined);
+
+      const result = await productService.findOne(productId);
+
+      expect(result).toStrictEqual(undefined);
+      expect(productRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: productId,
+        },
+      });
     });
   });
 
