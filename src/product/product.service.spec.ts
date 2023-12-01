@@ -24,6 +24,7 @@ describe('ProductService', () => {
             create: jest.fn(),
             save: jest.fn(),
             find: jest.fn(),
+            findOne: jest.fn(),
             findOneBy: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -78,6 +79,46 @@ describe('ProductService', () => {
       expect(productRepository.create).toHaveBeenCalledWith(productDto);
       expect(productRepository.save).toHaveBeenCalledTimes(1);
       expect(productRepository.save).toHaveBeenCalledWith(productMock);
+    });
+  });
+
+  describe('findOne', () => {
+    it('should find a product sucessfully', async () => {
+      const productId = randomUUID();
+
+      const productMock: ProductEntity = {
+        id: productId,
+      } as ProductEntity;
+
+      jest
+        .spyOn(productRepository, 'findOne')
+        .mockResolvedValueOnce(productMock);
+
+      const result = await productService.findOne(productId);
+
+      expect(result).toStrictEqual(productMock);
+      expect(productRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: productId,
+        },
+      });
+    });
+
+    it('should return a undefined when no product is finded', async () => {
+      const productId = randomUUID();
+
+      jest.spyOn(productRepository, 'findOne').mockResolvedValueOnce(undefined);
+
+      const result = await productService.findOne(productId);
+
+      expect(result).toStrictEqual(undefined);
+      expect(productRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(productRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: productId,
+        },
+      });
     });
   });
 

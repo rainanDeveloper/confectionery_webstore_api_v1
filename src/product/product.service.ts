@@ -40,6 +40,14 @@ export class ProductService {
     });
   }
 
+  async findOne(id: string): Promise<ProductEntity> {
+    return this.productRepository.findOne({
+      where: {
+        id,
+      },
+    });
+  }
+
   async search(searchDto: SearchProductDto): Promise<ProductEntity[]> {
     const skip = (searchDto.page - 1) * this.paginationAmount;
     const take = this.paginationAmount;
