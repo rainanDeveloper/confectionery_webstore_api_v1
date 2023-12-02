@@ -7,6 +7,7 @@ import { CreateCartItemDto } from './dtos/create-cart-item.dto';
 import { randomUUID } from 'crypto';
 import { ProductService } from 'src/product/product.service';
 import { ProductEntity } from 'src/product/entities/product.entity';
+import { NewCartItemDto } from './dtos/new-cart-item.dto';
 
 describe('CartItemService', () => {
   let cartItemService: CartItemService;
@@ -59,16 +60,23 @@ describe('CartItemService', () => {
 
       const cartItemMock = new CartItemEntity();
 
-      const productMock = new ProductEntity();
-
-      productMock.id = cartItemMock.product.id;
-      productMock.stockAmount = 10;
-
       cartItemMock.product = {} as any;
       cartItemMock.cart = {} as any;
 
       cartItemMock.product.id = createCartItemDto.product.id;
       cartItemMock.cart.id = createCartItemDto.cart.id;
+
+      const productMock = new ProductEntity();
+
+      productMock.id = cartItemMock.product.id;
+      productMock.stockAmount = 10;
+      productMock.unitValue = 20;
+
+      const newCartItemDto: NewCartItemDto = {
+        ...createCartItemDto,
+        unitValue: productMock.unitValue,
+        total: productMock.unitValue * createCartItemDto.quantity,
+      };
 
       jest
         .spyOn(cartItemRepository, `create`)
@@ -79,10 +87,10 @@ describe('CartItemService', () => {
       const result = await cartItemService.create(createCartItemDto);
 
       expect(result).toStrictEqual(cartItemMock);
-      expect(cartItemRepository.create).toHaveBeenCalledTimes(1);
-      expect(cartItemRepository.create).toHaveBeenCalledWith(createCartItemDto);
       expect(productService.findOne).toHaveBeenCalledTimes(1);
       expect(productService.findOne).toHaveBeenCalledWith(productMock.id);
+      expect(cartItemRepository.create).toHaveBeenCalledTimes(1);
+      expect(cartItemRepository.create).toHaveBeenCalledWith(newCartItemDto);
     });
   });
 });
