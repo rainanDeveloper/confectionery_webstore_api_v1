@@ -99,9 +99,9 @@ describe('CustomerController', () => {
 
       const requestMock = {
         user: {
-          id: customerId
-        }
-      } as any
+          id: customerId,
+        },
+      } as any;
 
       jest
         .spyOn(customerService, 'findOne')
@@ -132,9 +132,9 @@ describe('CustomerController', () => {
       const customerId = randomUUID();
       const requestMock = {
         user: {
-          id: customerId
-        }
-      } as any
+          id: customerId,
+        },
+      } as any;
 
       const updateCustomerDto: UpdateCustomerDto = {
         name: 'Some New name',
@@ -162,9 +162,9 @@ describe('CustomerController', () => {
 
       const requestMock = {
         user: {
-          id: customerId
-        }
-      } as any
+          id: customerId,
+        },
+      } as any;
 
       const result = await customerController.delete(requestMock);
 
