@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { CreateCartItemDto } from './dtos/create-cart-item.dto';
 import { ProductService } from 'src/product/product.service';
 import { NewCartItemDto } from './dtos/new-cart-item.dto';
+import { CartService } from 'src/cart/cart.service';
 
 @Injectable()
 export class CartItemService {
@@ -17,6 +18,7 @@ export class CartItemService {
     @InjectRepository(CartItemEntity)
     private readonly cartItemRepository: Repository<CartItemEntity>,
     @Inject(ProductService) private readonly productService: ProductService,
+    @Inject(CartService) private readonly cartService: CartService,
   ) {}
 
   async create(createCartItemDto: CreateCartItemDto): Promise<CartItemEntity> {

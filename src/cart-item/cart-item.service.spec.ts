@@ -8,11 +8,13 @@ import { randomUUID } from 'crypto';
 import { ProductService } from 'src/product/product.service';
 import { ProductEntity } from 'src/product/entities/product.entity';
 import { NewCartItemDto } from './dtos/new-cart-item.dto';
+import { CartService } from 'src/cart/cart.service';
 
 describe('CartItemService', () => {
   let cartItemService: CartItemService;
   let cartItemRepository: Repository<CartItemEntity>;
   let productService: ProductService;
+  let cartService: CartService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,6 +32,10 @@ describe('CartItemService', () => {
             findOne: jest.fn(),
           },
         },
+        {
+          provide: CartService,
+          useValue: {},
+        },
       ],
     }).compile();
 
@@ -44,6 +50,7 @@ describe('CartItemService', () => {
     expect(cartItemService).toBeDefined();
     expect(cartItemRepository).toBeDefined();
     expect(productService).toBeDefined();
+    expect(cartService).toBeDefined();
   });
 
   describe('create', () => {
