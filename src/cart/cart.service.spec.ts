@@ -3,6 +3,7 @@ import { CartService } from './cart.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 
 describe('CartService', () => {
   let cartService: CartService;
@@ -14,7 +15,9 @@ describe('CartService', () => {
         CartService,
         {
           provide: getRepositoryToken(CartEntity),
-          useValue: {},
+          useValue: {
+            findOne: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -35,6 +38,43 @@ describe('CartService', () => {
       // Arrange
       // Act
       // Assert
+    });
+  });
+
+  describe('findOne', () => {
+    it('should find a cart successfully', async () => {
+      const cartId = randomUUID();
+      const cartMock = new CartEntity();
+
+      jest.spyOn(cartRepository, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.findOne(cartId, true);
+
+      expect(result).toStrictEqual(cartMock);
+      expect(cartRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(cartRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: cartId,
+        },
+        relations: ['itens'],
+      });
+    });
+
+    it('should find a cart successfully without including itens', async () => {
+      const cartId = randomUUID();
+      const cartMock = new CartEntity();
+
+      jest.spyOn(cartRepository, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.findOne(cartId, false);
+
+      expect(result).toStrictEqual(cartMock);
+      expect(cartRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(cartRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: cartId,
+        },
+      });
     });
   });
 });

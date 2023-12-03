@@ -26,9 +26,19 @@ export class CartItemService {
       createCartItemDto.product.id,
     );
 
+    const existentCart = await this.cartService.findOne(
+      createCartItemDto.cart.id,
+      false,
+    );
+
+    if (!existentCart)
+      throw new NotFoundException(
+        `Cart ${createCartItemDto.cart.id} not found`,
+      );
+
     if (!existentProduct)
       throw new NotFoundException(
-        `Product ${createCartItemDto.product.id} not found!`,
+        `Product ${createCartItemDto.product.id} not found`,
       );
 
     if (existentProduct.stockAmount < createCartItemDto.quantity)
