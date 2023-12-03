@@ -9,6 +9,7 @@ import { ProductService } from 'src/product/product.service';
 import { ProductEntity } from 'src/product/entities/product.entity';
 import { NewCartItemDto } from './dtos/new-cart-item.dto';
 import { CartService } from 'src/cart/cart.service';
+import { CartEntity } from 'src/cart/entities/cart.entity';
 
 describe('CartItemService', () => {
   let cartItemService: CartItemService;
@@ -34,7 +35,9 @@ describe('CartItemService', () => {
         },
         {
           provide: CartService,
-          useValue: {},
+          useValue: {
+            findOne: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -44,6 +47,7 @@ describe('CartItemService', () => {
       getRepositoryToken(CartItemEntity),
     );
     productService = module.get<ProductService>(ProductService);
+    cartService = module.get<CartService>(CartService);
   });
 
   it('should be defined', () => {
@@ -75,6 +79,10 @@ describe('CartItemService', () => {
 
       const productMock = new ProductEntity();
 
+      const cartMock = new CartEntity();
+
+      cartMock.id = cartItemMock.cart.id;
+
       productMock.id = cartItemMock.product.id;
       productMock.stockAmount = 10;
       productMock.unitValue = 20;
@@ -85,15 +93,22 @@ describe('CartItemService', () => {
         total: productMock.unitValue * createCartItemDto.quantity,
       };
 
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      jest.spyOn(productService, 'findOne').mockResolvedValueOnce(productMock);
+
       jest
         .spyOn(cartItemRepository, `create`)
         .mockReturnValueOnce(cartItemMock);
 
-      jest.spyOn(productService, 'findOne').mockResolvedValueOnce(productMock);
-
       const result = await cartItemService.create(createCartItemDto);
 
       expect(result).toStrictEqual(cartItemMock);
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(
+        createCartItemDto.cart.id,
+        false,
+      );
       expect(productService.findOne).toHaveBeenCalledTimes(1);
       expect(productService.findOne).toHaveBeenCalledWith(productMock.id);
       expect(cartItemRepository.create).toHaveBeenCalledTimes(1);
