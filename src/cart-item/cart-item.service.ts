@@ -22,13 +22,13 @@ export class CartItemService {
   ) {}
 
   async create(createCartItemDto: CreateCartItemDto): Promise<CartItemEntity> {
-    const existentProduct = await this.productService.findOne(
-      createCartItemDto.product.id,
-    );
-
     const existentCart = await this.cartService.findOne(
       createCartItemDto.cart.id,
       false,
+    );
+
+    const existentProduct = await this.productService.findOne(
+      createCartItemDto.product.id,
     );
 
     if (!existentCart)

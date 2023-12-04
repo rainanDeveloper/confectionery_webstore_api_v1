@@ -10,6 +10,7 @@ import { ProductEntity } from 'src/product/entities/product.entity';
 import { NewCartItemDto } from './dtos/new-cart-item.dto';
 import { CartService } from 'src/cart/cart.service';
 import { CartEntity } from 'src/cart/entities/cart.entity';
+import { NotFoundException } from '@nestjs/common';
 
 describe('CartItemService', () => {
   let cartItemService: CartItemService;
@@ -114,6 +115,65 @@ describe('CartItemService', () => {
       expect(productService.findOne).toHaveBeenCalledWith(productMock.id);
       expect(cartItemRepository.create).toHaveBeenCalledTimes(1);
       expect(cartItemRepository.create).toHaveBeenCalledWith(newCartItemDto);
+    });
+
+    it('should validate the existence of the cart', async () => {
+      const createCartItemDto: CreateCartItemDto = {
+        product: {
+          id: randomUUID(),
+        },
+        cart: {
+          id: randomUUID(),
+        },
+        quantity: 1,
+      };
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(undefined);
+
+      const resultPromise = cartItemService.create(createCartItemDto);
+
+      expect(resultPromise).rejects.toThrow(NotFoundException);
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(
+        createCartItemDto.cart.id,
+        false,
+      );
+      expect(productService.findOne).not.toHaveBeenCalled();
+      expect(cartItemRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should validate the existence of the product', async () => {
+      const createCartItemDto: CreateCartItemDto = {
+        product: {
+          id: randomUUID(),
+        },
+        cart: {
+          id: randomUUID(),
+        },
+        quantity: 1,
+      };
+
+      const cartMock = new CartEntity();
+
+      cartMock.id = createCartItemDto.cart.id;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      jest.spyOn(productService, 'findOne').mockResolvedValueOnce(undefined);
+
+      const resultPromise = cartItemService.create(createCartItemDto);
+
+      expect(resultPromise).rejects.toThrow(NotFoundException);
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(
+        createCartItemDto.cart.id,
+        false,
+      );
+      expect(productService.findOne).toHaveBeenCalledTimes(1);
+      expect(productService.findOne).toHaveBeenCalledWith(
+        createCartItemDto.product.id,
+      );
+      expect(cartItemRepository.create).not.toHaveBeenCalled();
     });
   });
 });
