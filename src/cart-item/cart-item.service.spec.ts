@@ -85,6 +85,7 @@ describe('CartItemService', () => {
 
       productMock.id = cartItemMock.product.id;
       productMock.stockAmount = 10;
+      productMock.stockReservedAmount = 2;
       productMock.unitValue = 20;
 
       const newCartItemDto: NewCartItemDto = {

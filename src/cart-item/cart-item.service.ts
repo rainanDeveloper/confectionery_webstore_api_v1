@@ -41,7 +41,10 @@ export class CartItemService {
         `Product ${createCartItemDto.product.id} not found`,
       );
 
-    if (existentProduct.stockAmount < createCartItemDto.quantity)
+    if (
+      existentProduct.stockAmount - existentProduct.stockReservedAmount <
+      createCartItemDto.quantity
+    )
       throw new BadRequestException(
         `Product ${createCartItemDto.product.id} has not enough itens in stock to add this much (${createCartItemDto.quantity}) to a cart`,
       );
