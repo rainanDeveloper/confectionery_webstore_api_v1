@@ -10,7 +10,7 @@ import { ProductEntity } from 'src/product/entities/product.entity';
 import { NewCartItemDto } from './dtos/new-cart-item.dto';
 import { CartService } from 'src/cart/cart.service';
 import { CartEntity } from 'src/cart/entities/cart.entity';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('CartItemService', () => {
   let cartItemService: CartItemService;
@@ -78,11 +78,11 @@ describe('CartItemService', () => {
       cartItemMock.product.id = createCartItemDto.product.id;
       cartItemMock.cart.id = createCartItemDto.cart.id;
 
-      const productMock = new ProductEntity();
-
       const cartMock = new CartEntity();
 
       cartMock.id = cartItemMock.cart.id;
+
+      const productMock = new ProductEntity();
 
       productMock.id = cartItemMock.product.id;
       productMock.stockAmount = 10;
@@ -168,6 +168,50 @@ describe('CartItemService', () => {
 
       expect(resultPromise)
         .rejects.toThrow(NotFoundException)
+        .then(() => {
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(
+            createCartItemDto.cart.id,
+            false,
+          );
+          expect(productService.findOne).toHaveBeenCalledTimes(1);
+          expect(productService.findOne).toHaveBeenCalledWith(
+            createCartItemDto.product.id,
+          );
+          expect(cartItemRepository.create).not.toHaveBeenCalled();
+        });
+    });
+
+    it('should validate the product when the selled amount is higher than the available', async () => {
+      const createCartItemDto: CreateCartItemDto = {
+        product: {
+          id: randomUUID(),
+        },
+        cart: {
+          id: randomUUID(),
+        },
+        quantity: 1,
+      };
+
+      const cartMock = new CartEntity();
+
+      cartMock.id = createCartItemDto.cart.id;
+
+      const productMock = new ProductEntity();
+
+      productMock.id = createCartItemDto.product.id;
+      productMock.stockAmount = 10;
+      productMock.stockReservedAmount = 10;
+      productMock.unitValue = 20;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      jest.spyOn(productService, 'findOne').mockResolvedValueOnce(productMock);
+
+      const resultPromise = cartItemService.create(createCartItemDto);
+
+      expect(resultPromise)
+        .rejects.toThrow(BadRequestException)
         .then(() => {
           expect(cartService.findOne).toHaveBeenCalledTimes(1);
           expect(cartService.findOne).toHaveBeenCalledWith(
