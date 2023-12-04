@@ -37,8 +37,6 @@ export class CartItemService {
       createCartItemDto.product.id,
     );
 
-    console.log(existentProduct);
-
     if (!existentProduct)
       throw new NotFoundException(
         `Product ${createCartItemDto.product.id} not found`,
