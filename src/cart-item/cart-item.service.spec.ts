@@ -132,14 +132,17 @@ describe('CartItemService', () => {
 
       const resultPromise = cartItemService.create(createCartItemDto);
 
-      expect(resultPromise).rejects.toThrow(NotFoundException);
-      expect(cartService.findOne).toHaveBeenCalledTimes(1);
-      expect(cartService.findOne).toHaveBeenCalledWith(
-        createCartItemDto.cart.id,
-        false,
-      );
-      expect(productService.findOne).not.toHaveBeenCalled();
-      expect(cartItemRepository.create).not.toHaveBeenCalled();
+      expect(resultPromise)
+        .rejects.toThrow(NotFoundException)
+        .then(() => {
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(
+            createCartItemDto.cart.id,
+            false,
+          );
+          expect(productService.findOne).not.toHaveBeenCalled();
+          expect(cartItemRepository.create).not.toHaveBeenCalled();
+        });
     });
 
     it('should validate the existence of the product', async () => {
@@ -163,17 +166,20 @@ describe('CartItemService', () => {
 
       const resultPromise = cartItemService.create(createCartItemDto);
 
-      expect(resultPromise).rejects.toThrow(NotFoundException);
-      expect(cartService.findOne).toHaveBeenCalledTimes(1);
-      expect(cartService.findOne).toHaveBeenCalledWith(
-        createCartItemDto.cart.id,
-        false,
-      );
-      expect(productService.findOne).toHaveBeenCalledTimes(1);
-      expect(productService.findOne).toHaveBeenCalledWith(
-        createCartItemDto.product.id,
-      );
-      expect(cartItemRepository.create).not.toHaveBeenCalled();
+      expect(resultPromise)
+        .rejects.toThrow(NotFoundException)
+        .then(() => {
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(
+            createCartItemDto.cart.id,
+            false,
+          );
+          expect(productService.findOne).toHaveBeenCalledTimes(1);
+          expect(productService.findOne).toHaveBeenCalledWith(
+            createCartItemDto.product.id,
+          );
+          expect(cartItemRepository.create).not.toHaveBeenCalled();
+        });
     });
   });
 });

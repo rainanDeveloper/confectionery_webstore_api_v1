@@ -27,14 +27,17 @@ export class CartItemService {
       false,
     );
 
+    if (!existentCart) {
+      throw new NotFoundException(
+        `Cart ${createCartItemDto.cart.id} not found`,
+      );
+    }
+
     const existentProduct = await this.productService.findOne(
       createCartItemDto.product.id,
     );
 
-    if (!existentCart)
-      throw new NotFoundException(
-        `Cart ${createCartItemDto.cart.id} not found`,
-      );
+    console.log(existentProduct);
 
     if (!existentProduct)
       throw new NotFoundException(
