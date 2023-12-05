@@ -1,23 +1,16 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsString, IsUUID } from 'class-validator';
-import { CreateCartItemDto } from 'src/cart-item/dtos/create-cart-item.dto';
+import { CreateCartControllerDto } from './create-cart-controller.dto';
+import { CartStatus } from '../enums/cart-status.enum';
+import { IsNotEmpty } from 'class-validator';
 
-export class CustomerLinkDto {
-  @ApiProperty()
-  @IsString()
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
-}
-
-export class CartItemLinksDto extends OmitType(CreateCartItemDto, ['cart']) {}
-
-export class CreateCartDto {
+export class CreateCartDto extends OmitType(CreateCartControllerDto, [
+  'itens',
+]) {
   @ApiProperty()
   @IsNotEmpty()
-  customer: CustomerLinkDto;
+  total: number;
 
   @ApiProperty()
-  @IsArray()
-  itens: CartItemLinksDto[];
+  @IsNotEmpty()
+  status: CartStatus;
 }
