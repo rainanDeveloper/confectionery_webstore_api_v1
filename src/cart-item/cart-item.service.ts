@@ -22,26 +22,30 @@ export class CartItemService {
   ) {}
 
   async create(createCartItemDto: CreateCartItemDto): Promise<CartItemEntity> {
-    const existentProduct = await this.productService.findOne(
-      createCartItemDto.product.id,
-    );
-
     const existentCart = await this.cartService.findOne(
       createCartItemDto.cart.id,
       false,
     );
 
-    if (!existentCart)
+    if (!existentCart) {
       throw new NotFoundException(
         `Cart ${createCartItemDto.cart.id} not found`,
       );
+    }
+
+    const existentProduct = await this.productService.findOne(
+      createCartItemDto.product.id,
+    );
 
     if (!existentProduct)
       throw new NotFoundException(
         `Product ${createCartItemDto.product.id} not found`,
       );
 
-    if (existentProduct.stockAmount < createCartItemDto.quantity)
+    if (
+      existentProduct.stockAmount - existentProduct.stockReservedAmount <
+      createCartItemDto.quantity
+    )
       throw new BadRequestException(
         `Product ${createCartItemDto.product.id} has not enough itens in stock to add this much (${createCartItemDto.quantity}) to a cart`,
       );
