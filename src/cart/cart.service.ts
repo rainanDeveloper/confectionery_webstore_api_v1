@@ -51,6 +51,10 @@ export class CartService {
       .reduce((accumulator, currentTotal) => {
         return accumulator + currentTotal;
       }, 0);
+
+    await this.cartRepository.save(newCart);
+
+    return newCart.id;
   }
 
   async findOne(id: string, includeItens: boolean): Promise<CartEntity> {
