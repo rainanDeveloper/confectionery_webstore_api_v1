@@ -207,4 +207,36 @@ describe('CartService', () => {
       });
     });
   });
+
+  describe('close', () => {
+    it('should close a open cart successfully', async () => {
+      const nowMock = new Date();
+      const cartIdMock = randomUUID();
+      const cartMock: CartEntity = {
+        id: cartIdMock,
+        itens: [
+          {
+            id: randomUUID(),
+          },
+        ],
+        total: 10,
+        status: CartStatus.OPEN,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.close(cartIdMock);
+
+      expect(result).toStrictEqual(cartIdMock);
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(cartIdMock, true);
+      expect(cartRepository.save).toHaveBeenCalledTimes(1);
+      expect(cartRepository.save).toHaveBeenCalledWith({
+        ...cartMock,
+        status: CartStatus.CLOSED,
+      });
+    });
+  });
 });
