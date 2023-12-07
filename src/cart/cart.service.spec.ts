@@ -122,6 +122,53 @@ describe('CartService', () => {
       expect(cartRepository.save).toHaveBeenNthCalledWith(1, cartMock);
       expect(cartRepository.save).toHaveBeenNthCalledWith(2, updatedCartMock);
     });
+
+    it('should create a new cart', async () => {
+      const createCartDto: CreateCartControllerDto = {
+        customer: {
+          id: randomUUID(),
+        },
+        itens: [
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 1,
+          },
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 2,
+          },
+        ],
+      };
+
+      const newCartDto: CreateCartDto = {
+        customer: createCartDto.customer,
+        total: 0,
+        status: CartStatus.OPEN,
+      };
+
+      jest.spyOn(cartItemService, 'create').mockRejectedValue(new Error());
+
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        customer: createCartDto.customer as any,
+        status: CartStatus.OPEN,
+      } as any;
+
+      jest.spyOn(cartRepository, 'create').mockReturnValueOnce(cartMock);
+
+      const result = await cartService.create(createCartDto);
+
+      expect(result).toStrictEqual(cartMock.id);
+      expect(cartRepository.create).toHaveBeenCalledTimes(1);
+      expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
+      expect(cartRepository.save).toHaveBeenCalledTimes(2);
+      expect(cartRepository.save).toHaveBeenNthCalledWith(1, cartMock);
+      expect(cartRepository.save).toHaveBeenNthCalledWith(2, cartMock);
+    });
   });
 
   describe('findOne', () => {
