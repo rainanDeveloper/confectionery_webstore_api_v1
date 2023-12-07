@@ -6,7 +6,6 @@ import { CreateCartItemDto } from 'src/cart-item/dtos/create-cart-item.dto';
 import { CreateCartControllerDto } from './dtos/create-cart-controller.dto';
 import { CreateCartDto } from './dtos/create-cart.dto';
 import { CartStatus } from './enums/cart-status.enum';
-import { ProductService } from 'src/product/product.service';
 import { CartItemService } from 'src/cart-item/cart-item.service';
 
 @Injectable()
