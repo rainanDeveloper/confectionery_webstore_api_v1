@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Inject,
   Injectable,
   UnprocessableEntityException,
@@ -75,6 +76,9 @@ export class CartService {
 
   async close(id: string): Promise<string> {
     const existentCart = await this.findOne(id, true);
+
+    if (existentCart.status !== CartStatus.OPEN)
+      throw new ConflictException(`Cart ${id} is already closed`);
 
     if (existentCart.total <= 0)
       throw new UnprocessableEntityException(
