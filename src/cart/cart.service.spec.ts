@@ -9,6 +9,7 @@ import { CartItemService } from 'src/cart-item/cart-item.service';
 import { CartItemEntity } from 'src/cart-item/entities/cart-item.entity';
 import { CartStatus } from './enums/cart-status.enum';
 import { CreateCartDto } from './dtos/create-cart.dto';
+import { ConflictException } from '@nestjs/common';
 
 describe('CartService', () => {
   let cartService: CartService;
@@ -237,6 +238,35 @@ describe('CartService', () => {
         ...cartMock,
         status: CartStatus.CLOSED,
       });
+    });
+
+    it('should throw a conflict exception when trying to close a cart that already is closed', async () => {
+      const nowMock = new Date();
+      const cartIdMock = randomUUID();
+      const cartMock: CartEntity = {
+        id: cartIdMock,
+        itens: [
+          {
+            id: randomUUID(),
+          },
+        ],
+        total: 10,
+        status: CartStatus.CLOSED,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const resultPromise = cartService.close(cartIdMock);
+
+      expect(resultPromise)
+        .rejects.toThrowError(ConflictException)
+        .then(() => {
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(cartIdMock, true);
+          expect(cartRepository.save).not.toHaveBeenCalled();
+        });
     });
   });
 });
