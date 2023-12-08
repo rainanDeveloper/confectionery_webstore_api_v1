@@ -301,6 +301,35 @@ describe('CartService', () => {
         });
     });
 
+    it('should throw a unprocessable entity exception when the total is less than zero', async () => {
+      const nowMock = new Date();
+      const cartIdMock = randomUUID();
+      const cartMock: CartEntity = {
+        id: cartIdMock,
+        itens: [
+          {
+            id: randomUUID(),
+          },
+        ],
+        total: -20,
+        status: CartStatus.OPEN,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const resultPromise = cartService.close(cartIdMock);
+
+      expect(resultPromise)
+        .rejects.toThrowError(UnprocessableEntityException)
+        .then(() => {
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(cartIdMock, true);
+          expect(cartRepository.save).not.toHaveBeenCalled();
+        });
+    });
+
     it('should throw a unprocessable entity exception when amount of itens is zero', async () => {
       const nowMock = new Date();
       const cartIdMock = randomUUID();
