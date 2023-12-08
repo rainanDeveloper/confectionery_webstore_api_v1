@@ -9,6 +9,10 @@ import { CartItemService } from 'src/cart-item/cart-item.service';
 import { CartItemEntity } from 'src/cart-item/entities/cart-item.entity';
 import { CartStatus } from './enums/cart-status.enum';
 import { CreateCartDto } from './dtos/create-cart.dto';
+import {
+  ConflictException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 
 describe('CartService', () => {
   let cartService: CartService;
@@ -205,6 +209,121 @@ describe('CartService', () => {
           id: cartId,
         },
       });
+    });
+  });
+
+  describe('close', () => {
+    it('should close a open cart successfully', async () => {
+      const nowMock = new Date();
+      const cartIdMock = randomUUID();
+      const cartMock: CartEntity = {
+        id: cartIdMock,
+        itens: [
+          {
+            id: randomUUID(),
+          },
+        ],
+        total: 10,
+        status: CartStatus.OPEN,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.close(cartIdMock);
+
+      expect(result).toStrictEqual(cartIdMock);
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(cartIdMock, true);
+      expect(cartRepository.save).toHaveBeenCalledTimes(1);
+      expect(cartRepository.save).toHaveBeenCalledWith({
+        ...cartMock,
+        status: CartStatus.CLOSED,
+      });
+    });
+
+    it('should throw a conflict exception when trying to close a cart that already is closed', async () => {
+      const nowMock = new Date();
+      const cartIdMock = randomUUID();
+      const cartMock: CartEntity = {
+        id: cartIdMock,
+        itens: [
+          {
+            id: randomUUID(),
+          },
+        ],
+        total: 10,
+        status: CartStatus.CLOSED,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const resultPromise = cartService.close(cartIdMock);
+
+      expect(resultPromise)
+        .rejects.toThrowError(ConflictException)
+        .then(() => {
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(cartIdMock, true);
+          expect(cartRepository.save).not.toHaveBeenCalled();
+        });
+    });
+
+    it('should throw a unprocessable entity exception when the total is equal zero', async () => {
+      const nowMock = new Date();
+      const cartIdMock = randomUUID();
+      const cartMock: CartEntity = {
+        id: cartIdMock,
+        itens: [
+          {
+            id: randomUUID(),
+          },
+        ],
+        total: 0,
+        status: CartStatus.OPEN,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const resultPromise = cartService.close(cartIdMock);
+
+      expect(resultPromise)
+        .rejects.toThrowError(UnprocessableEntityException)
+        .then(() => {
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(cartIdMock, true);
+          expect(cartRepository.save).not.toHaveBeenCalled();
+        });
+    });
+
+    it('should throw a unprocessable entity exception when amount of itens is zero', async () => {
+      const nowMock = new Date();
+      const cartIdMock = randomUUID();
+      const cartMock: CartEntity = {
+        id: cartIdMock,
+        itens: [],
+        total: 10,
+        status: CartStatus.OPEN,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const resultPromise = cartService.close(cartIdMock);
+
+      expect(resultPromise)
+        .rejects.toThrowError(UnprocessableEntityException)
+        .then(() => {
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(cartIdMock, true);
+          expect(cartRepository.save).not.toHaveBeenCalled();
+        });
     });
   });
 });

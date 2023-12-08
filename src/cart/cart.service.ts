@@ -1,4 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
 import { FindOneOptions, Repository } from 'typeorm';
@@ -16,7 +21,7 @@ export class CartService {
     @Inject(CartItemService) private readonly cartItemService: CartItemService,
   ) {}
 
-  async create(createCartDto: CreateCartControllerDto) {
+  async create(createCartDto: CreateCartControllerDto): Promise<string> {
     const newCartDto: CreateCartDto = {
       customer: createCartDto.customer,
       total: 0,
@@ -67,5 +72,28 @@ export class CartService {
     }
 
     return await this.cartRepository.findOne(findOneOptions);
+  }
+
+  async close(id: string): Promise<string> {
+    const existentCart = await this.findOne(id, true);
+
+    if (existentCart.status !== CartStatus.OPEN)
+      throw new ConflictException(`Cart ${id} is already closed`);
+
+    if (existentCart.total <= 0)
+      throw new UnprocessableEntityException(
+        `The cart ${id} has not a valid total, so it cannot be closed`,
+      );
+
+    if (existentCart.itens.length == 0)
+      throw new UnprocessableEntityException(
+        `The cart ${id} doesn't have itens on it, so it cannot be closed`,
+      );
+
+    existentCart.status = CartStatus.CLOSED;
+
+    await this.cartRepository.save(existentCart);
+
+    return existentCart.id;
   }
 }
