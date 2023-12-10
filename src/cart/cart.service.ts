@@ -81,6 +81,7 @@ export class CartService {
         customer: {
           id: customerId,
         },
+        status: CartStatus.OPEN,
       },
     };
 

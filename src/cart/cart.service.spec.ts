@@ -230,6 +230,7 @@ describe('CartService', () => {
           customer: {
             id: customerId,
           },
+          status: CartStatus.OPEN,
         },
       });
     });
