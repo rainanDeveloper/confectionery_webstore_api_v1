@@ -214,14 +214,14 @@ describe('CartService', () => {
     });
   });
 
-  describe('findAnyForCustomer', () => {
+  describe('findAnyOpenForCustomer', () => {
     it('should find a customer successfully', async () => {
       const customerId = randomUUID();
       const cartMock = new CartEntity();
 
       jest.spyOn(cartRepository, 'findOne').mockResolvedValueOnce(cartMock);
 
-      const result = await cartService.findAnyForCustomer(customerId);
+      const result = await cartService.findAnyOpenForCustomer(customerId);
 
       expect(result).toStrictEqual(cartMock);
       expect(cartRepository.findOne).toHaveBeenCalledTimes(1);
