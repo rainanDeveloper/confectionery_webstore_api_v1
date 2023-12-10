@@ -189,6 +189,7 @@ describe('CartService', () => {
       expect(cartRepository.findOne).toHaveBeenCalledWith({
         where: {
           id: cartId,
+          status: CartStatus.OPEN,
         },
         relations: ['itens'],
       });
@@ -207,6 +208,7 @@ describe('CartService', () => {
       expect(cartRepository.findOne).toHaveBeenCalledWith({
         where: {
           id: cartId,
+          status: CartStatus.OPEN,
         },
       });
     });
