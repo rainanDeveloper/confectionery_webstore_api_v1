@@ -65,6 +65,7 @@ export class CartService {
     const findOneOptions: FindOneOptions = {
       where: {
         id,
+        status: CartStatus.OPEN,
       },
     };
     if (includeItens) {
