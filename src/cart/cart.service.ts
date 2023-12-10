@@ -75,6 +75,19 @@ export class CartService {
     return await this.cartRepository.findOne(findOneOptions);
   }
 
+  async findAnyOpenForCustomer(customerId: string) {
+    const findOneOptions: FindOneOptions<CartEntity> = {
+      where: {
+        customer: {
+          id: customerId,
+        },
+        status: CartStatus.OPEN,
+      },
+    };
+
+    return await this.cartRepository.findOne(findOneOptions);
+  }
+
   async close(id: string): Promise<string> {
     const existentCart = await this.findOne(id, true);
 

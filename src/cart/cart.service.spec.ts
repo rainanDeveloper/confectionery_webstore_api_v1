@@ -214,6 +214,28 @@ describe('CartService', () => {
     });
   });
 
+  describe('findAnyOpenForCustomer', () => {
+    it('should find a customer successfully', async () => {
+      const customerId = randomUUID();
+      const cartMock = new CartEntity();
+
+      jest.spyOn(cartRepository, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.findAnyOpenForCustomer(customerId);
+
+      expect(result).toStrictEqual(cartMock);
+      expect(cartRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(cartRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          customer: {
+            id: customerId,
+          },
+          status: CartStatus.OPEN,
+        },
+      });
+    });
+  });
+
   describe('close', () => {
     it('should close a open cart successfully', async () => {
       const nowMock = new Date();
