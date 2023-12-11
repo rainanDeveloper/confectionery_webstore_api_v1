@@ -124,6 +124,85 @@ describe('CartService', () => {
       const result = await cartService.create(createCartDto);
 
       expect(result).toStrictEqual(cartMock.id);
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
+        createCartDto.customer.id,
+      );
+      expect(cartRepository.create).toHaveBeenCalledTimes(1);
+      expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
+      expect(cartRepository.save).toHaveBeenCalledTimes(2);
+      expect(cartRepository.save).toHaveBeenNthCalledWith(1, cartMock);
+      expect(cartRepository.save).toHaveBeenNthCalledWith(2, updatedCartMock);
+    });
+
+    it('should create a new cart without customer', async () => {
+      const createCartDto: CreateCartServiceDto = {
+        itens: [
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 1,
+          },
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 2,
+          },
+        ],
+      };
+
+      const newCartDto: CreateCartDto = {
+        customer: createCartDto.customer,
+        total: 0,
+        status: CartStatus.OPEN,
+      };
+
+      const itensPriceMock = Math.round(100 * 10000 * Math.random()) / 1000; // Creates a 4 decimal price for all itens
+
+      const itemCreationMockFn = async (itemDto) => {
+        const newItem = new CartItemEntity();
+        newItem.id = randomUUID();
+        newItem.unitValue = itensPriceMock;
+        newItem.total = itensPriceMock * itemDto.quantity;
+        newItem.quantity = itemDto.quantity;
+        newItem.product = itemDto.product as any;
+
+        return newItem;
+      };
+
+      const itensMock = await Promise.all(
+        createCartDto.itens.map(itemCreationMockFn),
+      );
+
+      jest
+        .spyOn(cartItemService, 'create')
+        .mockImplementation(itemCreationMockFn); // Mocks implementation of create method
+
+      jest
+        .spyOn(cartService, 'findAnyOpenForCustomer')
+        .mockResolvedValueOnce(undefined);
+
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        customer: createCartDto.customer as any,
+        status: CartStatus.OPEN,
+      } as any;
+
+      jest.spyOn(cartRepository, 'create').mockReturnValueOnce(cartMock);
+
+      const updatedCartMock = {
+        ...cartMock,
+        total: itensMock
+          .map((item) => item.total)
+          .reduce((accumulator, currentTotal) => accumulator + currentTotal, 0),
+      };
+
+      const result = await cartService.create(createCartDto);
+
+      expect(result).toStrictEqual(cartMock.id);
+      expect(cartService.findAnyOpenForCustomer).not.toHaveBeenCalled();
       expect(cartRepository.create).toHaveBeenCalledTimes(1);
       expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
       expect(cartRepository.save).toHaveBeenCalledTimes(2);
@@ -166,11 +245,19 @@ describe('CartService', () => {
         status: CartStatus.OPEN,
       } as any;
 
+      jest
+        .spyOn(cartService, 'findAnyOpenForCustomer')
+        .mockResolvedValueOnce(undefined);
+
       jest.spyOn(cartRepository, 'create').mockReturnValueOnce(cartMock);
 
       const result = await cartService.create(createCartDto);
 
       expect(result).toStrictEqual(cartMock.id);
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
+        createCartDto.customer.id,
+      );
       expect(cartRepository.create).toHaveBeenCalledTimes(1);
       expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
       expect(cartRepository.save).toHaveBeenCalledTimes(2);
@@ -228,9 +315,16 @@ describe('CartService', () => {
 
       const resultPromise = cartService.create(createCartDto);
 
-      expect(resultPromise).rejects.toThrow(ConflictException);
-      expect(cartRepository.create).not.toHaveBeenCalled();
-      expect(cartRepository.save).not.toHaveBeenCalled();
+      expect(resultPromise)
+        .rejects.toThrow(ConflictException)
+        .then(() => {
+          expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
+          expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
+            createCartDto.customer.id,
+          );
+          expect(cartRepository.create).not.toHaveBeenCalled();
+          expect(cartRepository.save).not.toHaveBeenCalled();
+        });
     });
   });
 
