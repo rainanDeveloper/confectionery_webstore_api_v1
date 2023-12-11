@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { CreateCartItemDto } from 'src/cart-item/dtos/create-cart-item.dto';
-import { CreateCartControllerDto } from './dtos/create-cart-controller.dto';
+import { CreateCartServiceDto } from './dtos/create-cart-service.dto';
 import { CreateCartDto } from './dtos/create-cart.dto';
 import { CartStatus } from './enums/cart-status.enum';
 import { CartItemService } from 'src/cart-item/cart-item.service';
@@ -21,12 +21,24 @@ export class CartService {
     @Inject(CartItemService) private readonly cartItemService: CartItemService,
   ) {}
 
-  async create(createCartDto: CreateCartControllerDto): Promise<string> {
+  async create(createCartDto: CreateCartServiceDto): Promise<string> {
     const newCartDto: CreateCartDto = {
-      customer: createCartDto.customer,
       total: 0,
       status: CartStatus.OPEN,
     };
+
+    if (createCartDto.customer && createCartDto.customer.id) {
+      const existentOpenCartForUser = await this.findAnyOpenForCustomer(
+        createCartDto.customer.id,
+      );
+
+      if (existentOpenCartForUser)
+        throw new ConflictException(
+          `There is an open cart for the informed customer already`,
+        );
+
+      newCartDto.customer = createCartDto.customer;
+    }
     const newCart = this.cartRepository.create(newCartDto);
 
     await this.cartRepository.save(newCart);

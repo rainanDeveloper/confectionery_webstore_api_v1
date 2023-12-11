@@ -1,5 +1,11 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { CreateCartItemDto } from 'src/cart-item/dtos/create-cart-item.dto';
 
 export class CustomerLinkDto {
@@ -12,10 +18,10 @@ export class CustomerLinkDto {
 
 export class CartItemLinksDto extends OmitType(CreateCartItemDto, ['cart']) {}
 
-export class CreateCartControllerDto {
+export class CreateCartServiceDto {
   @ApiProperty()
-  @IsNotEmpty()
-  customer: CustomerLinkDto;
+  @IsOptional()
+  customer?: CustomerLinkDto;
 
   @ApiProperty()
   @IsArray()
