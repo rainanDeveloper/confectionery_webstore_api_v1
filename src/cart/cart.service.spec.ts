@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
-import { CreateCartControllerDto } from './dtos/create-cart-controller.dto';
+import { CreateCartServiceDto } from './dtos/create-cart-service.dto';
 import { CartItemService } from 'src/cart-item/cart-item.service';
 import { CartItemEntity } from 'src/cart-item/entities/cart-item.entity';
 import { CartStatus } from './enums/cart-status.enum';
@@ -55,7 +55,7 @@ describe('CartService', () => {
 
   describe('create', () => {
     it('should create a new cart', async () => {
-      const createCartDto: CreateCartControllerDto = {
+      const createCartDto: CreateCartServiceDto = {
         customer: {
           id: randomUUID(),
         },
@@ -128,7 +128,7 @@ describe('CartService', () => {
     });
 
     it('should create a new cart', async () => {
-      const createCartDto: CreateCartControllerDto = {
+      const createCartDto: CreateCartServiceDto = {
         customer: {
           id: randomUUID(),
         },
