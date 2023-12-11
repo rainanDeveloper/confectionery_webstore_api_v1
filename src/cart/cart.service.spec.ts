@@ -54,7 +54,7 @@ describe('CartService', () => {
   });
 
   describe('create', () => {
-    it('should create a new cart', async () => {
+    it('should create a new cart with customer', async () => {
       const createCartDto: CreateCartServiceDto = {
         customer: {
           id: randomUUID(),
@@ -102,6 +102,10 @@ describe('CartService', () => {
         .spyOn(cartItemService, 'create')
         .mockImplementation(itemCreationMockFn); // Mocks implementation of create method
 
+      jest
+        .spyOn(cartService, 'findAnyOpenForCustomer')
+        .mockResolvedValueOnce(undefined);
+
       const cartMock: CartEntity = {
         id: randomUUID(),
         customer: createCartDto.customer as any,
@@ -127,7 +131,7 @@ describe('CartService', () => {
       expect(cartRepository.save).toHaveBeenNthCalledWith(2, updatedCartMock);
     });
 
-    it('should create a new cart', async () => {
+    it('should create a new cart with no itens due to item creation error', async () => {
       const createCartDto: CreateCartServiceDto = {
         customer: {
           id: randomUUID(),
@@ -172,6 +176,61 @@ describe('CartService', () => {
       expect(cartRepository.save).toHaveBeenCalledTimes(2);
       expect(cartRepository.save).toHaveBeenNthCalledWith(1, cartMock);
       expect(cartRepository.save).toHaveBeenNthCalledWith(2, cartMock);
+    });
+
+    it('should throw a ConflictException due to existent open cart for informed customer', async () => {
+      const createCartDto: CreateCartServiceDto = {
+        customer: {
+          id: randomUUID(),
+        },
+        itens: [
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 1,
+          },
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 2,
+          },
+        ],
+      };
+
+      const itensPriceMock = Math.round(100 * 10000 * Math.random()) / 1000; // Creates a 4 decimal price for all itens
+
+      const itemCreationMockFn = async (itemDto) => {
+        const newItem = new CartItemEntity();
+        newItem.id = randomUUID();
+        newItem.unitValue = itensPriceMock;
+        newItem.total = itensPriceMock * itemDto.quantity;
+        newItem.quantity = itemDto.quantity;
+        newItem.product = itemDto.product as any;
+
+        return newItem;
+      };
+
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        customer: createCartDto.customer as any,
+        status: CartStatus.OPEN,
+      } as any;
+
+      jest
+        .spyOn(cartItemService, 'create')
+        .mockImplementation(itemCreationMockFn); // Mocks implementation of create method
+
+      jest
+        .spyOn(cartService, 'findAnyOpenForCustomer')
+        .mockResolvedValueOnce(cartMock);
+
+      const resultPromise = cartService.create(createCartDto);
+
+      expect(resultPromise).rejects.toThrow(ConflictException);
+      expect(cartRepository.create).not.toHaveBeenCalled();
+      expect(cartRepository.save).not.toHaveBeenCalled();
     });
   });
 
