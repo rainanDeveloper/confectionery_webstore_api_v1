@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomBytes, randomUUID } from 'crypto';
 import { JwtPayloadDto } from '../dtos/jwt-payload.dto';
-import { JwtStrategy } from './jwt-customer.strategy';
+import { JwtStrategy } from './jwt-user.strategy';
 import { UserService } from 'src/user/user.service';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { UnauthorizedException } from '@nestjs/common';
