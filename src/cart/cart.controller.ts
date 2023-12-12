@@ -6,7 +6,7 @@ import { CreateCartServiceDto } from './dtos/create-cart-service.dto';
 
 @Controller('cart')
 export class CartController {
-  constructor(@Inject(CartService) private readonly cartService) {}
+  constructor(@Inject(CartService) private readonly cartService: CartService) {}
 
   async create(
     @Req() request: Request,
@@ -24,6 +24,8 @@ export class CartController {
       };
     }
 
-    return await this.cartService.create(createCartServiceDto);
+    const cartId = await this.cartService.create(createCartServiceDto);
+
+    return { id: cartId };
   }
 }

@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CartController } from './cart.controller';
 import { CartService } from './cart.service';
+import { CreateCartControllerDto } from './dtos/create-cart-controller.dto';
+import { randomUUID } from 'crypto';
 
 describe('CartController', () => {
   let cartController: CartController;
@@ -12,7 +14,9 @@ describe('CartController', () => {
       providers: [
         {
           provide: CartService,
-          useValue: {},
+          useValue: {
+            create: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -24,5 +28,35 @@ describe('CartController', () => {
   it('should be defined', () => {
     expect(cartController).toBeDefined();
     expect(cartService).toBeDefined();
+  });
+
+  describe('create', () => {
+    it('should create a cart sucessfully', async () => {
+      const createCartControllerDto: CreateCartControllerDto = {
+        itens: [
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 1,
+          },
+        ],
+      };
+
+      const requestMock = {} as any;
+
+      const newCartId = randomUUID();
+
+      jest.spyOn(cartService, 'create').mockResolvedValueOnce(newCartId);
+
+      const result = await cartController.create(
+        requestMock,
+        createCartControllerDto,
+      );
+
+      expect(result).toStrictEqual(newCartId);
+      expect(cartService.create).toHaveBeenCalledTimes(1);
+      expect(cartService.create).toHaveBeenCalledWith(createCartControllerDto);
+    });
   });
 });
