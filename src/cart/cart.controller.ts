@@ -1,13 +1,16 @@
-import { Body, Controller, Inject, Req } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Req } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartControllerDto } from './dtos/create-cart-controller.dto';
 import { Request } from 'express';
 import { CreateCartServiceDto } from './dtos/create-cart-service.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('cart')
+@ApiTags('Cart')
 export class CartController {
   constructor(@Inject(CartService) private readonly cartService: CartService) {}
 
+  @Post()
   async create(
     @Req() request: Request,
     @Body() createCartControllerDto: CreateCartControllerDto,
