@@ -64,7 +64,7 @@ export class CustomerController {
     description: "NOT FOUND: customer with informed id wasn't found",
     type: NotFoundErrorDto,
   })
-  @UseGuards(AuthGuard('customer-jwt'))
+  @UseGuards(AuthGuard('jwt-customer'))
   @ApiBearerAuth()
   async findOne(@Req() request: Request) {
     const user = request.user as any;
@@ -79,7 +79,7 @@ export class CustomerController {
     description: "NOT FOUND: customer with informed id wasn't found",
     type: NotFoundErrorDto,
   })
-  @UseGuards(AuthGuard('customer-jwt'))
+  @UseGuards(AuthGuard('jwt-customer'))
   @ApiBearerAuth()
   async update(
     @Req() request: Request,
@@ -103,7 +103,7 @@ export class CustomerController {
     description: "NOT FOUND: customer with informed id wasn't found",
     type: NotFoundErrorDto,
   })
-  @UseGuards(AuthGuard('customer-jwt'))
+  @UseGuards(AuthGuard('jwt-customer'))
   @ApiBearerAuth()
   async delete(@Req() request: Request) {
     const user = request.user as any;
