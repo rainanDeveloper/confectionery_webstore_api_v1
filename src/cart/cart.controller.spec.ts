@@ -58,5 +58,42 @@ describe('CartController', () => {
       expect(cartService.create).toHaveBeenCalledTimes(1);
       expect(cartService.create).toHaveBeenCalledWith(createCartControllerDto);
     });
+
+    it('should create a cart with user if a user is finded', async () => {
+      const createCartControllerDto: CreateCartControllerDto = {
+        itens: [
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 1,
+          },
+        ],
+      };
+
+      const requestMock = {
+        user: {
+          id: randomUUID(),
+        },
+      } as any;
+
+      const newCartId = randomUUID();
+
+      jest.spyOn(cartService, 'create').mockResolvedValueOnce(newCartId);
+
+      const result = await cartController.create(
+        requestMock,
+        createCartControllerDto,
+      );
+
+      expect(result).toStrictEqual(newCartId);
+      expect(cartService.create).toHaveBeenCalledTimes(1);
+      expect(cartService.create).toHaveBeenCalledWith({
+        ...createCartControllerDto,
+        customer: {
+          id: requestMock.user.id,
+        },
+      });
+    });
   });
 });
