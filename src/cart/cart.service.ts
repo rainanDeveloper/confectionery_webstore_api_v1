@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   UnprocessableEntityException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
@@ -18,7 +19,8 @@ export class CartService {
   constructor(
     @InjectRepository(CartEntity)
     private readonly cartRepository: Repository<CartEntity>,
-    @Inject(CartItemService) private readonly cartItemService: CartItemService,
+    @Inject(forwardRef(() => CartItemService))
+    private readonly cartItemService: CartItemService,
   ) {}
 
   async create(createCartDto: CreateCartServiceDto): Promise<string> {
