@@ -23,7 +23,7 @@ export class CreateCartServiceDto {
   @IsOptional()
   customer?: CustomerLinkDto;
 
-  @ApiProperty()
+  @ApiProperty({ type: CartItemLinksDto, isArray: true })
   @IsArray()
   itens: CartItemLinksDto[];
 }

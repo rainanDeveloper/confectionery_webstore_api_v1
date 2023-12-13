@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartItemEntity } from './entities/cart-item.entity';
@@ -18,7 +19,8 @@ export class CartItemService {
     @InjectRepository(CartItemEntity)
     private readonly cartItemRepository: Repository<CartItemEntity>,
     @Inject(ProductService) private readonly productService: ProductService,
-    @Inject(CartService) private readonly cartService: CartService,
+    @Inject(forwardRef(() => CartService))
+    private readonly cartService: CartService,
   ) {}
 
   async create(createCartItemDto: CreateCartItemDto): Promise<CartItemEntity> {

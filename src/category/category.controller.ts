@@ -24,7 +24,7 @@ export class CategoryController {
   ) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt-user'))
   @ApiBearerAuth()
   async create(
     @Body() createCategoryDto: CreateCategoryDto,
@@ -38,7 +38,7 @@ export class CategoryController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt-user'))
   @ApiBearerAuth()
   async update(
     @Param('id') id: string,
@@ -48,7 +48,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt-user'))
   @ApiBearerAuth()
   async delete(@Param('id') id: string) {
     return await this.categoryService.delete(id);

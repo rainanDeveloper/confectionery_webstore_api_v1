@@ -6,7 +6,7 @@ import { JwtPayloadDto } from '../dtos/jwt-payload.dto';
 import { CustomerService } from 'src/customer/customer.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'customer-jwt') {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-customer') {
   constructor(
     @Inject(ConfigService) configService: ConfigService,
     @Inject(CustomerService)

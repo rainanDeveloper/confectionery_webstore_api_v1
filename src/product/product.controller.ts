@@ -29,7 +29,7 @@ export class ProductController {
   ) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt-user'))
   @ApiBearerAuth()
   async create(
     @Res() response: Response,
@@ -45,7 +45,7 @@ export class ProductController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt-user'))
   @ApiBearerAuth()
   async update(@Param('id') id: string, @Body() productDto: UpdateProductDto) {
     return this.productService.update(id, productDto);
@@ -70,7 +70,7 @@ export class ProductController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt-user'))
   @ApiBearerAuth()
   async delete(@Param('id') id: string) {
     return await this.productService.delete(id);

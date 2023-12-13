@@ -29,7 +29,7 @@ import { Response } from 'express';
 
 @Controller('user')
 @ApiTags('User')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt-user'))
 @ApiBearerAuth()
 export class UserController {
   constructor(@Inject(UserService) private readonly userService: UserService) {}

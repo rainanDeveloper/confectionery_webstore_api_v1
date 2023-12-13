@@ -23,7 +23,7 @@ import { UpdateCustomerAddressDto } from './dtos/update-customer-address.dto';
 
 @ApiTags('Customer Address')
 @Controller('customer-address')
-@UseGuards(AuthGuard('customer-jwt'))
+@UseGuards(AuthGuard('jwt-customer'))
 @ApiBearerAuth()
 export class CustomerAddressController {
   constructor(
