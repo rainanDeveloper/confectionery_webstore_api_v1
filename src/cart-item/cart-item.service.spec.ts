@@ -26,6 +26,7 @@ describe('CartItemService', () => {
           provide: getRepositoryToken(CartItemEntity),
           useValue: {
             create: jest.fn(),
+            save: jest.fn(),
           },
         },
         {
