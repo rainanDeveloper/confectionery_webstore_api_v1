@@ -60,6 +60,12 @@ export class CartItemService {
 
     const newItem = this.cartItemRepository.create(newCartItemDto);
 
+    try {
+      await this.cartItemRepository.save(newItem);
+    } catch (error) {
+      return undefined;
+    }
+
     return newItem;
   }
 }

@@ -3,12 +3,15 @@ import { ProductEntity } from 'src/product/entities/product.entity';
 import {
   Column,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+@Entity('cart_item')
 export class CartItemEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -17,6 +20,7 @@ export class CartItemEntity {
   product: ProductEntity;
 
   @ManyToOne(() => CartEntity, (cart) => cart.itens)
+  @JoinColumn({ name: 'cart_id' })
   cart: CartEntity;
 
   @Column({

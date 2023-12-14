@@ -1,12 +1,14 @@
-import { Body, Controller, Inject, Post, Req } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartControllerDto } from './dtos/create-cart-controller.dto';
 import { Request } from 'express';
 import { CreateCartServiceDto } from './dtos/create-cart-service.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { OptionalJwtCustomerGuard } from 'src/customer-auth/guards/optional-jwt-customer.guard';
 
 @Controller('cart')
 @ApiTags('Cart')
+@UseGuards(OptionalJwtCustomerGuard)
 export class CartController {
   constructor(@Inject(CartService) private readonly cartService: CartService) {}
 
