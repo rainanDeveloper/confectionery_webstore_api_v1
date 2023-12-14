@@ -78,7 +78,14 @@ export class CartService {
         return accumulator + currentTotal;
       }, 0);
 
-    await this.cartRepository.save(newCart);
+    try {
+      await this.cartRepository.save(newCart);
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: `Error during the cart update of totals`,
+        error,
+      });
+    }
 
     return newCart.id;
   }
