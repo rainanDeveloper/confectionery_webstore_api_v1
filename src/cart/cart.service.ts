@@ -2,6 +2,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   UnprocessableEntityException,
   forwardRef,
 } from '@nestjs/common';
@@ -43,7 +44,14 @@ export class CartService {
     }
     const newCart = this.cartRepository.create(newCartDto);
 
-    await this.cartRepository.save(newCart);
+    try {
+      await this.cartRepository.save(newCart);
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: `Error during the cart creation`,
+        error,
+      });
+    }
 
     const promiseItensResult = await Promise.allSettled(
       createCartDto.itens.map(async (item) => {
@@ -62,7 +70,7 @@ export class CartService {
     // Calculate the total of the cart as a sum of the total of the itens
     newCart.total = promiseItensResult
       .map((itemResult) => {
-        if (itemResult.status == 'rejected') return;
+        if (itemResult.status == 'rejected') return 0;
 
         return itemResult.value.total;
       })

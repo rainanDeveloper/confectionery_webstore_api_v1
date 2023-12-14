@@ -2,6 +2,8 @@ import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import {
   Column,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -10,11 +12,15 @@ import {
 import { CartStatus } from '../enums/cart-status.enum';
 import { CartItemEntity } from 'src/cart-item/entities/cart-item.entity';
 
+@Entity('cart')
 export class CartEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ManyToOne(() => CustomerEntity)
+  @JoinColumn({
+    name: 'customer_id',
+  })
   customer: CustomerEntity;
 
   @OneToMany(() => CartItemEntity, (item) => item.cart)
