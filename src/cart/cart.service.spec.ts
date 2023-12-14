@@ -11,6 +11,7 @@ import { CartStatus } from './enums/cart-status.enum';
 import { CreateCartDto } from './dtos/create-cart.dto';
 import {
   ConflictException,
+  InternalServerErrorException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 
@@ -324,6 +325,84 @@ describe('CartService', () => {
           );
           expect(cartRepository.create).not.toHaveBeenCalled();
           expect(cartRepository.save).not.toHaveBeenCalled();
+        });
+    });
+
+    it('should throw a InternalServerErrorException due to cart criation error', async () => {
+      const createCartDto: CreateCartServiceDto = {
+        customer: {
+          id: randomUUID(),
+        },
+        itens: [
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 1,
+          },
+          {
+            product: {
+              id: randomUUID(),
+            },
+            quantity: 2,
+          },
+        ],
+      };
+
+      const newCartDto: CreateCartDto = {
+        customer: createCartDto.customer,
+        total: 0,
+        status: CartStatus.OPEN,
+      };
+
+      const itensPriceMock = Math.round(100 * 10000 * Math.random()) / 1000; // Creates a 4 decimal price for all itens
+
+      const itemCreationMockFn = async (itemDto) => {
+        const newItem = new CartItemEntity();
+        newItem.id = randomUUID();
+        newItem.unitValue = itensPriceMock;
+        newItem.total = itensPriceMock * itemDto.quantity;
+        newItem.quantity = itemDto.quantity;
+        newItem.product = itemDto.product as any;
+
+        return newItem;
+      };
+
+      const itensMock = await Promise.all(
+        createCartDto.itens.map(itemCreationMockFn),
+      );
+
+      jest
+        .spyOn(cartItemService, 'create')
+        .mockImplementation(itemCreationMockFn); // Mocks implementation of create method
+
+      jest
+        .spyOn(cartService, 'findAnyOpenForCustomer')
+        .mockResolvedValueOnce(undefined);
+
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        customer: createCartDto.customer as any,
+        status: CartStatus.OPEN,
+      } as any;
+
+      jest.spyOn(cartRepository, 'create').mockReturnValueOnce(cartMock);
+
+      jest.spyOn(cartRepository, 'save').mockRejectedValueOnce(new Error());
+
+      const resultPromise = cartService.create(createCartDto);
+
+      expect(resultPromise)
+        .rejects.toThrowError(InternalServerErrorException)
+        .then(() => {
+          expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
+          expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
+            createCartDto.customer.id,
+          );
+          expect(cartRepository.create).toHaveBeenCalledTimes(1);
+          expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
+          expect(cartRepository.save).toHaveBeenCalledTimes(1);
+          expect(cartRepository.save).toHaveBeenNthCalledWith(1, cartMock);
         });
     });
   });
