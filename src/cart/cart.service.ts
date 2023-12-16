@@ -53,7 +53,7 @@ export class CartService {
       });
     }
 
-    const promiseItensResult = await Promise.allSettled(
+    const itens = await Promise.all(
       createCartDto.itens.map(async (item) => {
         const cartItemDto: CreateCartItemDto = {
           cart: { id: newCart.id },
@@ -68,15 +68,10 @@ export class CartService {
     );
 
     // Calculate the total of the cart as a sum of the total of the itens
-    newCart.total = promiseItensResult
-      .map((itemResult) => {
-        if (itemResult.status == 'rejected') return 0;
-
-        return itemResult.value.total;
-      })
-      .reduce((accumulator, currentTotal) => {
-        return accumulator + currentTotal;
-      }, 0);
+    newCart.total = itens.reduce(
+      (prevTotal, currentItem) => prevTotal + currentItem.total,
+      0,
+    );
 
     try {
       await this.cartRepository.save(newCart);
