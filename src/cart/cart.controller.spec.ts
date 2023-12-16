@@ -54,7 +54,7 @@ describe('CartController', () => {
         createCartControllerDto,
       );
 
-      expect(result).toStrictEqual(newCartId);
+      expect(result).toStrictEqual({ id: newCartId });
       expect(cartService.create).toHaveBeenCalledTimes(1);
       expect(cartService.create).toHaveBeenCalledWith(createCartControllerDto);
     });
@@ -86,7 +86,7 @@ describe('CartController', () => {
         createCartControllerDto,
       );
 
-      expect(result).toStrictEqual(newCartId);
+      expect(result).toStrictEqual({ id: newCartId });
       expect(cartService.create).toHaveBeenCalledTimes(1);
       expect(cartService.create).toHaveBeenCalledWith({
         ...createCartControllerDto,
