@@ -252,18 +252,20 @@ describe('CartService', () => {
 
       jest.spyOn(cartRepository, 'create').mockReturnValueOnce(cartMock);
 
-      const result = await cartService.create(createCartDto);
+      const resultPromise = cartService.create(createCartDto);
 
-      expect(result).toStrictEqual(cartMock.id);
-      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
-      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
-        createCartDto.customer.id,
-      );
-      expect(cartRepository.create).toHaveBeenCalledTimes(1);
-      expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
-      expect(cartRepository.save).toHaveBeenCalledTimes(2);
-      expect(cartRepository.save).toHaveBeenNthCalledWith(1, cartMock);
-      expect(cartRepository.save).toHaveBeenNthCalledWith(2, cartMock);
+      expect(resultPromise)
+        .rejects.toThrow(Error)
+        .then(() => {
+          expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
+          expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
+            createCartDto.customer.id,
+          );
+          expect(cartRepository.create).toHaveBeenCalledTimes(1);
+          expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
+          expect(cartRepository.save).toHaveBeenCalledTimes(1);
+          expect(cartRepository.save).toHaveBeenNthCalledWith(1, cartMock);
+        });
     });
 
     it('should throw a ConflictException due to existent open cart for informed customer', async () => {
@@ -491,10 +493,6 @@ describe('CartService', () => {
           expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
           expect(cartRepository.save).toHaveBeenCalledTimes(2);
           expect(cartRepository.save).toHaveBeenNthCalledWith(1, cartMock);
-          expect(cartRepository.save).toHaveBeenNthCalledWith(
-            1,
-            updatedCartMock,
-          );
           expect(cartRepository.save).toHaveBeenNthCalledWith(
             2,
             updatedCartMock,

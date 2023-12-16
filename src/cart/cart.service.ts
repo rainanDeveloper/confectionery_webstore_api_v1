@@ -70,7 +70,7 @@ export class CartService {
     // Calculate the total of the cart as a sum of the total of the itens
     newCart.total = itens.reduce(
       (prevTotal, currentItem) => prevTotal + currentItem.total,
-      newCart.total,
+      0,
     );
 
     try {
