@@ -547,7 +547,10 @@ describe('CartService', () => {
 
       jest.spyOn(cartRepository, 'findOne').mockResolvedValueOnce(cartMock);
 
-      const result = await cartService.findAnyOpenForCustomer(customerId);
+      const result = await cartService.findAnyOpenForCustomer(
+        customerId,
+        false,
+      );
 
       expect(result).toStrictEqual(cartMock);
       expect(cartRepository.findOne).toHaveBeenCalledTimes(1);

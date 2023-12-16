@@ -33,6 +33,7 @@ export class CartService {
     if (createCartDto.customer && createCartDto.customer.id) {
       const existentOpenCartForUser = await this.findAnyOpenForCustomer(
         createCartDto.customer.id,
+        false,
       );
 
       if (existentOpenCartForUser)
@@ -99,7 +100,7 @@ export class CartService {
     return await this.cartRepository.findOne(findOneOptions);
   }
 
-  async findAnyOpenForCustomer(customerId: string) {
+  async findAnyOpenForCustomer(customerId: string, includeItens: boolean) {
     const findOneOptions: FindOneOptions<CartEntity> = {
       where: {
         customer: {
@@ -108,6 +109,10 @@ export class CartService {
         status: CartStatus.OPEN,
       },
     };
+
+    if (includeItens) {
+      findOneOptions.relations = ['itens'];
+    }
 
     return await this.cartRepository.findOne(findOneOptions);
   }
