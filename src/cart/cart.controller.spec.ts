@@ -3,6 +3,9 @@ import { CartController } from './cart.controller';
 import { CartService } from './cart.service';
 import { CreateCartControllerDto } from './dtos/create-cart-controller.dto';
 import { randomUUID } from 'crypto';
+import { CartEntity } from './entities/cart.entity';
+import { CartStatus } from './enums/cart-status.enum';
+import { Request } from 'express';
 
 describe('CartController', () => {
   let cartController: CartController;
@@ -16,6 +19,7 @@ describe('CartController', () => {
           provide: CartService,
           useValue: {
             create: jest.fn(),
+            findOne: jest.fn(),
           },
         },
       ],
@@ -94,6 +98,23 @@ describe('CartController', () => {
           id: requestMock.user.id,
         },
       });
+    });
+  });
+
+  describe('findOne', () => {
+    it('should find a cart successfully', async () => {
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        total: 20,
+        status: CartStatus.OPEN,
+      } as CartEntity;
+
+      const requestMock = {} as Request;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartController.findOne(requestMock, cartMock.id);
+      expect(result).toStrictEqual(cartMock);
     });
   });
 });
