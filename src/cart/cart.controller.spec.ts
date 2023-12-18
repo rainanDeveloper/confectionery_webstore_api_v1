@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto';
 import { CartEntity } from './entities/cart.entity';
 import { CartStatus } from './enums/cart-status.enum';
 import { Request } from 'express';
+import { CustomerEntity } from 'src/customer/entities/customer.entity';
 
 describe('CartController', () => {
   let cartController: CartController;
@@ -20,6 +21,7 @@ describe('CartController', () => {
           useValue: {
             create: jest.fn(),
             findOne: jest.fn(),
+            findAnyOpenForCustomer: jest.fn(),
           },
         },
       ],
@@ -115,6 +117,39 @@ describe('CartController', () => {
 
       const result = await cartController.findOne(requestMock, cartMock.id);
       expect(result).toStrictEqual(cartMock);
+      expect(cartService.findAnyOpenForCustomer).not.toHaveBeenCalled();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(cartMock.id, true);
+    });
+
+    it('should find a cart successfully by signed customer', async () => {
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        customer: {
+          id: randomUUID(),
+        },
+        total: 20,
+        status: CartStatus.OPEN,
+      } as CartEntity;
+
+      const requestMock = {
+        user: {
+          id: cartMock.customer.id,
+        },
+      } as any;
+
+      jest
+        .spyOn(cartService, 'findAnyOpenForCustomer')
+        .mockResolvedValueOnce(cartMock);
+
+      const result = await cartController.findOne(requestMock);
+      expect(result).toStrictEqual(cartMock);
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
+        requestMock.user.id,
+        true,
+      );
+      expect(cartService.findOne).not.toHaveBeenCalled();
     });
   });
 });

@@ -47,7 +47,7 @@ export class CartController {
   @Get()
   async findOne(
     @Req() request: Request,
-    @Query('id') id: string,
+    @Query('id') id?: string,
   ): Promise<CartEntity> {
     const user = request.user as any;
 
