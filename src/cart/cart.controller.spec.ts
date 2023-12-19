@@ -26,6 +26,7 @@ describe('CartController', () => {
             create: jest.fn(),
             findOne: jest.fn(),
             findAnyOpenForCustomer: jest.fn(),
+            updateTotal: jest.fn(),
           },
         },
         {
@@ -204,6 +205,9 @@ describe('CartController', () => {
       expect(cartService.findAnyOpenForCustomer).not.toHaveBeenCalled();
       expect(cartService.findOne).toHaveBeenCalledTimes(1);
       expect(cartService.findOne).toHaveBeenCalledWith(cartMock.id, true);
+      expect(cartService.findAnyOpenForCustomer).not.toHaveBeenCalled();
+      expect(cartService.updateTotal).toHaveBeenCalledTimes(1);
+      expect(cartService.updateTotal).toHaveBeenCalledWith(cartMock.id);
       expect(cartItemService.create).toHaveBeenCalledTimes(1);
       expect(cartItemService.create).toHaveBeenCalledWith({
         ...cartItemDto,
@@ -259,6 +263,8 @@ describe('CartController', () => {
         true,
       );
       expect(cartService.findOne).not.toHaveBeenCalled();
+      expect(cartService.updateTotal).toHaveBeenCalledTimes(1);
+      expect(cartService.updateTotal).toHaveBeenCalledWith(cartMock.id);
       expect(cartItemService.create).toHaveBeenCalledTimes(1);
       expect(cartItemService.create).toHaveBeenCalledWith({
         ...cartItemDto,

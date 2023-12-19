@@ -87,11 +87,15 @@ export class CartController {
 
     if (!existentCart) throw new NotFoundException(`Cart not found!`);
 
-    return await this.cartItemService.create({
+    const item = await this.cartItemService.create({
       ...cartItemDto,
       cart: {
         id: existentCart.id,
       },
     });
+
+    await this.cartService.updateTotal(existentCart.id);
+
+    return item;
   }
 }
