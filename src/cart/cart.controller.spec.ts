@@ -212,5 +212,60 @@ describe('CartController', () => {
         },
       });
     });
+
+    it('should add a new item to the cart from the signed customer', async () => {
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        customer: {
+          id: randomUUID(),
+        },
+        total: 20,
+        status: CartStatus.OPEN,
+      } as CartEntity;
+
+      const cartItemDto: CartItemLinksDto = {
+        product: {
+          id: randomUUID(),
+        },
+        quantity: 1,
+      };
+
+      const mockUnitValue = (Math.random() * 100 * 1000) / 1000;
+
+      const cartItemMock: CartItemEntity = {
+        product: cartItemDto.product,
+        cart: cartMock,
+        unitValue: mockUnitValue,
+        quantity: cartItemDto.quantity,
+        total: cartItemDto.quantity * mockUnitValue,
+      } as CartItemEntity;
+
+      const requestMock = {
+        user: {
+          id: cartMock.customer.id,
+        },
+      } as any;
+
+      jest
+        .spyOn(cartService, 'findAnyOpenForCustomer')
+        .mockResolvedValueOnce(cartMock);
+      jest.spyOn(cartItemService, 'create').mockResolvedValueOnce(cartItemMock);
+
+      const result = await cartController.addItem(requestMock, cartItemDto);
+      expect(result).toStrictEqual(cartItemMock);
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
+        requestMock.user.id,
+        true,
+      );
+      expect(cartService.findOne).not.toHaveBeenCalled();
+      expect(cartItemService.create).toHaveBeenCalledTimes(1);
+      expect(cartItemService.create).toHaveBeenCalledWith({
+        ...cartItemDto,
+        cart: {
+          id: cartMock.id,
+        },
+      });
+    });
   });
 });
