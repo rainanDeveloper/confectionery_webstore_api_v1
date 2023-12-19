@@ -117,6 +117,17 @@ export class CartService {
     return await this.cartRepository.findOne(findOneOptions);
   }
 
+  async updateTotal(id: string) {
+    const existentCart = await this.findOne(id, true);
+
+    existentCart.total = existentCart.itens.reduce(
+      (prevTotal, currentItem) => prevTotal + currentItem.total,
+      0,
+    );
+
+    await this.cartRepository.save(existentCart);
+  }
+
   async close(id: string): Promise<string> {
     const existentCart = await this.findOne(id, true);
 

@@ -128,6 +128,7 @@ describe('CartService', () => {
       expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
       expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
         createCartDto.customer.id,
+        false,
       );
       expect(cartRepository.create).toHaveBeenCalledTimes(1);
       expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
@@ -260,6 +261,7 @@ describe('CartService', () => {
           expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
           expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
             createCartDto.customer.id,
+            false,
           );
           expect(cartRepository.create).toHaveBeenCalledTimes(1);
           expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
@@ -324,6 +326,7 @@ describe('CartService', () => {
           expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
           expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
             createCartDto.customer.id,
+            false,
           );
           expect(cartRepository.create).not.toHaveBeenCalled();
           expect(cartRepository.save).not.toHaveBeenCalled();
@@ -400,6 +403,7 @@ describe('CartService', () => {
           expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
           expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
             createCartDto.customer.id,
+            false,
           );
           expect(cartRepository.create).toHaveBeenCalledTimes(1);
           expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
@@ -488,6 +492,7 @@ describe('CartService', () => {
           expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
           expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
             createCartDto.customer.id,
+            false,
           );
           expect(cartRepository.create).toHaveBeenCalledTimes(1);
           expect(cartRepository.create).toHaveBeenCalledWith(newCartDto);
