@@ -73,7 +73,7 @@ export class CartController {
     @Body() cartItemDto: CartItemLinksDto,
     @Query('id') id?: string,
   ) {
-    let existentCart;
+    let existentCart: CartEntity;
     const user = request.user as any;
 
     if (user) {
