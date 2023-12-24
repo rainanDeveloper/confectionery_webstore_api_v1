@@ -15,10 +15,12 @@ import { CustomerAddressModule } from './customer-address/customer-address.modul
 import { CustomerAuthModule } from './customer-auth/customer-auth.module';
 import { CartModule } from './cart/cart.module';
 import { CartItemModule } from './cart-item/cart-item.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
