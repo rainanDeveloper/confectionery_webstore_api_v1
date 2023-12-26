@@ -15,4 +15,12 @@ describe('CartCronJobsService', () => {
   it('should be defined', () => {
     expect(cartCronJobsService).toBeDefined();
   });
+
+  describe('deleteOldClosedCartsJob', () => {
+    it('Should execute the service to delete all closed carts within last 30 days', async () => {
+      //Arrange
+      //Act
+      //Assert
+    });
+  });
 });
