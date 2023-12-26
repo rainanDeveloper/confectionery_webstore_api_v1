@@ -15,10 +15,14 @@ import { CustomerAddressModule } from './customer-address/customer-address.modul
 import { CustomerAuthModule } from './customer-auth/customer-auth.module';
 import { CartModule } from './cart/cart.module';
 import { CartItemModule } from './cart-item/cart-item.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CartCronJobsService } from './cart-cron-jobs/cart-cron-jobs.service';
+import { CartCronJobsModule } from './cart-cron-jobs/cart-cron-jobs.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -45,8 +49,9 @@ import { CartItemModule } from './cart-item/cart-item.module';
     CustomerAuthModule,
     CartModule,
     CartItemModule,
+    CartCronJobsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CartCronJobsService],
 })
 export class AppModule {}
