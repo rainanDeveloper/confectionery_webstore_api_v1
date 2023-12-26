@@ -29,6 +29,7 @@ describe('CartService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            find: jest.fn(),
             findOne: jest.fn(),
           },
         },
@@ -573,6 +574,28 @@ describe('CartService', () => {
   describe('findAllSavedBefore', () => {
     it('should find all the carts updated before informed date', async () => {
       const date = new Date('2022-01-01');
+
+      const cartsMock: CartEntity[] = [
+        {
+          id: randomUUID(),
+          status: CartStatus.CLOSED,
+          createdAt: new Date('2021-09-09'),
+          updatedAt: new Date('2021-09-09'),
+        } as CartEntity,
+        {
+          id: randomUUID(),
+          status: CartStatus.CLOSED,
+          createdAt: new Date('2021-03-21'),
+          updatedAt: new Date('2021-04-12'),
+        } as CartEntity,
+      ];
+
+      jest.spyOn(cartRepository, 'find').mockResolvedValueOnce(cartsMock);
+
+      const result = await cartService.findAllSavedBefore(date);
+
+      expect(result).toStrictEqual(cartsMock);
+      expect(cartRepository.find).toHaveBeenCalledTimes(1);
     });
   });
 
