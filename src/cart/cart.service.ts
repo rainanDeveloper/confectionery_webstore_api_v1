@@ -117,6 +117,8 @@ export class CartService {
     return await this.cartRepository.findOne(findOneOptions);
   }
 
+  async findAllSavedBefore(date: string) {}
+
   async updateTotal(id: string) {
     const existentCart = await this.findOne(id, true);
 

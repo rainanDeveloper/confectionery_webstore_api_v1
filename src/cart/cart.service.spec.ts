@@ -570,6 +570,12 @@ describe('CartService', () => {
     });
   });
 
+  describe('findAllSavedBefore', () => {
+    it('should find all the carts updated before informed date', async () => {
+      const date = new Date('2022-01-01');
+    });
+  });
+
   describe('close', () => {
     it('should close a open cart successfully', async () => {
       const nowMock = new Date();
