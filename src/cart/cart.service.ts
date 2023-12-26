@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, LessThan, Repository } from 'typeorm';
 import { CreateCartItemDto } from 'src/cart-item/dtos/create-cart-item.dto';
 import { CreateCartServiceDto } from './dtos/create-cart-service.dto';
 import { CreateCartDto } from './dtos/create-cart.dto';
@@ -117,8 +117,13 @@ export class CartService {
     return await this.cartRepository.findOne(findOneOptions);
   }
 
-  async findAllSavedBefore(date: Date) {
-    return this.cartRepository.find();
+  async findAllClosedSavedBefore(date: Date) {
+    return this.cartRepository.find({
+      where: {
+        updatedAt: LessThan(date),
+        status: CartStatus.CLOSED,
+      },
+    });
   }
 
   async updateTotal(id: string) {

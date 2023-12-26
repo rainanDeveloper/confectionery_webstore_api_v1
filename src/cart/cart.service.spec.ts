@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CartService } from './cart.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { CreateCartServiceDto } from './dtos/create-cart-service.dto';
 import { CartItemService } from 'src/cart-item/cart-item.service';
@@ -571,9 +571,9 @@ describe('CartService', () => {
     });
   });
 
-  describe('findAllSavedBefore', () => {
+  describe('findAllClosedSavedBefore', () => {
     it('should find all the carts updated before informed date', async () => {
-      const date = new Date('2022-01-01');
+      const dateMock = new Date('2022-01-01');
 
       const cartsMock: CartEntity[] = [
         {
@@ -592,10 +592,16 @@ describe('CartService', () => {
 
       jest.spyOn(cartRepository, 'find').mockResolvedValueOnce(cartsMock);
 
-      const result = await cartService.findAllSavedBefore(date);
+      const result = await cartService.findAllClosedSavedBefore(dateMock);
 
       expect(result).toStrictEqual(cartsMock);
       expect(cartRepository.find).toHaveBeenCalledTimes(1);
+      expect(cartRepository.find).toHaveBeenCalledWith({
+        where: {
+          updatedAt: LessThan(dateMock),
+          status: CartStatus.CLOSED,
+        },
+      });
     });
   });
 
