@@ -31,12 +31,14 @@ describe('CartService', () => {
             save: jest.fn(),
             find: jest.fn(),
             findOne: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
           provide: CartItemService,
           useValue: {
             create: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -746,6 +748,32 @@ describe('CartService', () => {
           expect(cartService.findOne).toHaveBeenCalledWith(cartIdMock, true);
           expect(cartRepository.save).not.toHaveBeenCalled();
         });
+    });
+  });
+
+  describe('delete', () => {
+    it('Deve deletar o carrinho com id informado', async () => {
+      const idMock = randomUUID();
+
+      const cartMock = new CartEntity();
+      cartMock.id = idMock;
+      cartMock.itens = [
+        {
+          id: randomUUID(),
+        } as CartItemEntity,
+      ];
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.delete(idMock);
+
+      expect(result).toBeUndefined();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(idMock);
+      expect(cartItemService.delete).toHaveBeenCalledTimes(1);
+      expect(cartItemService.delete).toHaveBeenCalledWith(cartMock.itens[0].id);
+      expect(cartRepository.delete).toHaveBeenCalledTimes(1);
+      expect(cartRepository.delete).toHaveBeenCalledWith(idMock);
     });
   });
 });

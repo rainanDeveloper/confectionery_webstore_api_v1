@@ -159,4 +159,21 @@ export class CartService {
 
     return existentCart.id;
   }
+
+  async delete(id: string) {
+    const cart = await this.findOne(id, true);
+
+    if (cart.itens.length > 0) {
+      await Promise.all(
+        // wait itens deletion
+        cart.itens.map(async (item) => {
+          await this.cartRepository.delete(item.id);
+        }),
+      );
+    }
+
+    await this.cartRepository.delete({
+      id,
+    });
+  }
 }
