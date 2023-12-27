@@ -1,12 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CartCronJobsService } from './cart-cron-jobs.service';
+import { CartService } from 'src/cart/cart.service';
 
 describe('CartCronJobsService', () => {
   let cartCronJobsService: CartCronJobsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CartCronJobsService],
+      providers: [
+        CartCronJobsService,
+        {
+          provide: CartService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
     cartCronJobsService = module.get<CartCronJobsService>(CartCronJobsService);
