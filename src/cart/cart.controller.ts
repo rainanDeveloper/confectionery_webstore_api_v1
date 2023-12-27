@@ -104,7 +104,6 @@ export class CartController {
   @Delete('remove/:itemId')
   async removeItem(
     @Req() request: Request,
-    @Body() cartItemDto: CartItemLinksDto,
     @Param('itemId') itemId: string,
     @Query('id') id?: string,
   ) {
