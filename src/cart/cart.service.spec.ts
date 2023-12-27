@@ -752,7 +752,7 @@ describe('CartService', () => {
   });
 
   describe('delete', () => {
-    it('Deve deletar o carrinho com id informado', async () => {
+    it('Deve deletar o carrinho com id informado - um único item', async () => {
       const idMock = randomUUID();
 
       const cartMock = new CartEntity();
@@ -769,11 +769,64 @@ describe('CartService', () => {
 
       expect(result).toBeUndefined();
       expect(cartService.findOne).toHaveBeenCalledTimes(1);
-      expect(cartService.findOne).toHaveBeenCalledWith(idMock);
+      expect(cartService.findOne).toHaveBeenCalledWith(idMock, true);
       expect(cartItemService.delete).toHaveBeenCalledTimes(1);
       expect(cartItemService.delete).toHaveBeenCalledWith(cartMock.itens[0].id);
       expect(cartRepository.delete).toHaveBeenCalledTimes(1);
-      expect(cartRepository.delete).toHaveBeenCalledWith(idMock);
+      expect(cartRepository.delete).toHaveBeenCalledWith({ id: idMock });
+    });
+
+    it('Deve deletar o carrinho com id informado - mais de um item', async () => {
+      const idMock = randomUUID();
+
+      const cartMock = new CartEntity();
+      cartMock.id = idMock;
+      cartMock.itens = [
+        {
+          id: randomUUID(),
+        } as CartItemEntity,
+        {
+          id: randomUUID(),
+        } as CartItemEntity,
+      ];
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.delete(idMock);
+
+      expect(result).toBeUndefined();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(idMock, true);
+      expect(cartItemService.delete).toHaveBeenCalledTimes(2);
+      expect(cartItemService.delete).toHaveBeenNthCalledWith(
+        1,
+        cartMock.itens[0].id,
+      );
+      expect(cartItemService.delete).toHaveBeenNthCalledWith(
+        2,
+        cartMock.itens[1].id,
+      );
+      expect(cartRepository.delete).toHaveBeenCalledTimes(1);
+      expect(cartRepository.delete).toHaveBeenCalledWith({ id: idMock });
+    });
+
+    it('Deve deletar o carrinho com id informado - sem itens', async () => {
+      const idMock = randomUUID();
+
+      const cartMock = new CartEntity();
+      cartMock.id = idMock;
+      cartMock.itens = [];
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.delete(idMock);
+
+      expect(result).toBeUndefined();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(idMock, true);
+      expect(cartItemService.delete).not.toHaveBeenCalled();
+      expect(cartRepository.delete).toHaveBeenCalledTimes(1);
+      expect(cartRepository.delete).toHaveBeenCalledWith({ id: idMock });
     });
   });
 });

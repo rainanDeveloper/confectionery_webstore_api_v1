@@ -167,7 +167,7 @@ export class CartService {
       await Promise.all(
         // wait itens deletion
         cart.itens.map(async (item) => {
-          await this.cartRepository.delete(item.id);
+          await this.cartItemService.delete(item.id);
         }),
       );
     }
