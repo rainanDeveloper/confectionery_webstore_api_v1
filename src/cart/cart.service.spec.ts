@@ -788,6 +788,25 @@ describe('CartService', () => {
       expect(cartService.delete).toHaveBeenNthCalledWith(2, cartsMock[1].id);
       MockDate.reset();
     });
+
+    it('should return when no carts are found', async () => {
+      const mockLastMonth = new Date('2022-01-20');
+      MockDate.set('2022-02-19');
+      const cartsMock: CartEntity[] = [];
+
+      jest
+        .spyOn(cartService, 'findAllClosedSavedBefore')
+        .mockResolvedValueOnce(cartsMock);
+      jest.spyOn(cartService, 'delete').mockResolvedValue();
+      await cartService.deleteAllClosedNotUpdatedOnLastMonth();
+
+      expect(cartService.findAllClosedSavedBefore).toHaveBeenCalledTimes(1);
+      expect(cartService.findAllClosedSavedBefore).toHaveBeenCalledWith(
+        mockLastMonth,
+      );
+      expect(cartService.delete).not.toHaveBeenCalled();
+      MockDate.reset();
+    });
   });
 
   describe('delete', () => {
