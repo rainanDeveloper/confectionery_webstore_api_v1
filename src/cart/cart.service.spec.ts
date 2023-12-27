@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import MockDate from 'mockdate';
 import { CartService } from './cart.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { CreateCartServiceDto } from './dtos/create-cart-service.dto';
 import { CartItemService } from 'src/cart-item/cart-item.service';
@@ -29,13 +30,16 @@ describe('CartService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            find: jest.fn(),
             findOne: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
           provide: CartItemService,
           useValue: {
             create: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -570,9 +574,37 @@ describe('CartService', () => {
     });
   });
 
-  describe('findAllSavedBefore', () => {
+  describe('findAllClosedSavedBefore', () => {
     it('should find all the carts updated before informed date', async () => {
-      const date = new Date('2022-01-01');
+      const dateMock = new Date('2022-01-01');
+
+      const cartsMock: CartEntity[] = [
+        {
+          id: randomUUID(),
+          status: CartStatus.CLOSED,
+          createdAt: new Date('2021-09-09'),
+          updatedAt: new Date('2021-09-09'),
+        } as CartEntity,
+        {
+          id: randomUUID(),
+          status: CartStatus.CLOSED,
+          createdAt: new Date('2021-03-21'),
+          updatedAt: new Date('2021-04-12'),
+        } as CartEntity,
+      ];
+
+      jest.spyOn(cartRepository, 'find').mockResolvedValueOnce(cartsMock);
+
+      const result = await cartService.findAllClosedSavedBefore(dateMock);
+
+      expect(result).toStrictEqual(cartsMock);
+      expect(cartRepository.find).toHaveBeenCalledTimes(1);
+      expect(cartRepository.find).toHaveBeenCalledWith({
+        where: {
+          updatedAt: LessThan(dateMock),
+          status: CartStatus.CLOSED,
+        },
+      });
     });
   });
 
@@ -717,6 +749,142 @@ describe('CartService', () => {
           expect(cartService.findOne).toHaveBeenCalledWith(cartIdMock, true);
           expect(cartRepository.save).not.toHaveBeenCalled();
         });
+    });
+  });
+
+  describe('deleteAllClosedNotUpdatedOnLastMonth', () => {
+    it('should delete all closed carts not updated on last month', async () => {
+      const mockLastMonth = new Date('2022-01-20');
+      MockDate.set('2022-02-19');
+      const cartsMock: CartEntity[] = [
+        {
+          id: randomUUID(),
+          itens: [],
+          status: CartStatus.CLOSED,
+          createdAt: new Date('2021-09-09'),
+          updatedAt: new Date('2021-09-09'),
+        } as CartEntity,
+        {
+          id: randomUUID(),
+          itens: [],
+          status: CartStatus.CLOSED,
+          createdAt: new Date('2021-03-21'),
+          updatedAt: new Date('2021-04-12'),
+        } as CartEntity,
+      ];
+
+      jest
+        .spyOn(cartService, 'findAllClosedSavedBefore')
+        .mockResolvedValueOnce(cartsMock);
+      jest.spyOn(cartService, 'delete').mockResolvedValue();
+      await cartService.deleteAllClosedNotUpdatedOnLastMonth();
+
+      expect(cartService.findAllClosedSavedBefore).toHaveBeenCalledTimes(1);
+      expect(cartService.findAllClosedSavedBefore).toHaveBeenCalledWith(
+        mockLastMonth,
+      );
+      expect(cartService.delete).toHaveBeenCalledTimes(2);
+      expect(cartService.delete).toHaveBeenNthCalledWith(1, cartsMock[0].id);
+      expect(cartService.delete).toHaveBeenNthCalledWith(2, cartsMock[1].id);
+      MockDate.reset();
+    });
+
+    it('should return when no carts are found', async () => {
+      const mockLastMonth = new Date('2022-01-20');
+      MockDate.set('2022-02-19');
+      const cartsMock: CartEntity[] = [];
+
+      jest
+        .spyOn(cartService, 'findAllClosedSavedBefore')
+        .mockResolvedValueOnce(cartsMock);
+      jest.spyOn(cartService, 'delete').mockResolvedValue();
+      await cartService.deleteAllClosedNotUpdatedOnLastMonth();
+
+      expect(cartService.findAllClosedSavedBefore).toHaveBeenCalledTimes(1);
+      expect(cartService.findAllClosedSavedBefore).toHaveBeenCalledWith(
+        mockLastMonth,
+      );
+      expect(cartService.delete).not.toHaveBeenCalled();
+      MockDate.reset();
+    });
+  });
+
+  describe('delete', () => {
+    it('Deve deletar o carrinho com id informado - um único item', async () => {
+      const idMock = randomUUID();
+
+      const cartMock = new CartEntity();
+      cartMock.id = idMock;
+      cartMock.itens = [
+        {
+          id: randomUUID(),
+        } as CartItemEntity,
+      ];
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.delete(idMock);
+
+      expect(result).toBeUndefined();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(idMock, true);
+      expect(cartItemService.delete).toHaveBeenCalledTimes(1);
+      expect(cartItemService.delete).toHaveBeenCalledWith(cartMock.itens[0].id);
+      expect(cartRepository.delete).toHaveBeenCalledTimes(1);
+      expect(cartRepository.delete).toHaveBeenCalledWith({ id: idMock });
+    });
+
+    it('Deve deletar o carrinho com id informado - mais de um item', async () => {
+      const idMock = randomUUID();
+
+      const cartMock = new CartEntity();
+      cartMock.id = idMock;
+      cartMock.itens = [
+        {
+          id: randomUUID(),
+        } as CartItemEntity,
+        {
+          id: randomUUID(),
+        } as CartItemEntity,
+      ];
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.delete(idMock);
+
+      expect(result).toBeUndefined();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(idMock, true);
+      expect(cartItemService.delete).toHaveBeenCalledTimes(2);
+      expect(cartItemService.delete).toHaveBeenNthCalledWith(
+        1,
+        cartMock.itens[0].id,
+      );
+      expect(cartItemService.delete).toHaveBeenNthCalledWith(
+        2,
+        cartMock.itens[1].id,
+      );
+      expect(cartRepository.delete).toHaveBeenCalledTimes(1);
+      expect(cartRepository.delete).toHaveBeenCalledWith({ id: idMock });
+    });
+
+    it('Deve deletar o carrinho com id informado - sem itens', async () => {
+      const idMock = randomUUID();
+
+      const cartMock = new CartEntity();
+      cartMock.id = idMock;
+      cartMock.itens = [];
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.delete(idMock);
+
+      expect(result).toBeUndefined();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(idMock, true);
+      expect(cartItemService.delete).not.toHaveBeenCalled();
+      expect(cartRepository.delete).toHaveBeenCalledTimes(1);
+      expect(cartRepository.delete).toHaveBeenCalledWith({ id: idMock });
     });
   });
 });

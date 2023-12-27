@@ -68,4 +68,10 @@ export class CartItemService {
 
     return newItem;
   }
+
+  async delete(id: string): Promise<void> {
+    await this.cartItemRepository.delete({
+      id,
+    });
+  }
 }

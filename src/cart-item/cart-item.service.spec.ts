@@ -27,6 +27,7 @@ describe('CartItemService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
@@ -225,6 +226,20 @@ describe('CartItemService', () => {
           );
           expect(cartItemRepository.create).not.toHaveBeenCalled();
         });
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete an item successfully', async () => {
+      const idMock = randomUUID();
+
+      const result = await cartItemService.delete(idMock);
+
+      expect(result).toBeUndefined();
+      expect(cartItemRepository.delete).toHaveBeenCalledTimes(1);
+      expect(cartItemRepository.delete).toHaveBeenCalledWith({
+        id: idMock,
+      });
     });
   });
 });

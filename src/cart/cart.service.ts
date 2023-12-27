@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, LessThan, Repository } from 'typeorm';
 import { CreateCartItemDto } from 'src/cart-item/dtos/create-cart-item.dto';
 import { CreateCartServiceDto } from './dtos/create-cart-service.dto';
 import { CreateCartDto } from './dtos/create-cart.dto';
@@ -117,7 +117,14 @@ export class CartService {
     return await this.cartRepository.findOne(findOneOptions);
   }
 
-  async findAllSavedBefore(date: string) {}
+  async findAllClosedSavedBefore(date: Date) {
+    return this.cartRepository.find({
+      where: {
+        updatedAt: LessThan(date),
+        status: CartStatus.CLOSED,
+      },
+    });
+  }
 
   async updateTotal(id: string) {
     const existentCart = await this.findOne(id, true);
@@ -151,5 +158,40 @@ export class CartService {
     await this.cartRepository.save(existentCart);
 
     return existentCart.id;
+  }
+
+  async deleteAllClosedNotUpdatedOnLastMonth() {
+    const now = new Date();
+
+    const lastMonthDate = new Date();
+
+    lastMonthDate.setDate(now.getDate() - 30);
+
+    const carts = await this.findAllClosedSavedBefore(lastMonthDate);
+
+    if (carts.length <= 0) return;
+
+    await Promise.all(
+      carts.map((cart) => {
+        return this.delete(cart.id);
+      }),
+    );
+  }
+
+  async delete(id: string) {
+    const cart = await this.findOne(id, true);
+
+    if (cart.itens.length > 0) {
+      await Promise.all(
+        // wait itens deletion
+        cart.itens.map((item) => {
+          return this.cartItemService.delete(item.id);
+        }),
+      );
+    }
+
+    await this.cartRepository.delete({
+      id,
+    });
   }
 }

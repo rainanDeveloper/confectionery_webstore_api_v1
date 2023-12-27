@@ -4,8 +4,10 @@ import { CartService } from 'src/cart/cart.service';
 
 @Injectable()
 export class CartCronJobsService {
-  constructor(@Inject() private readonly cartService: CartService) {}
+  constructor(@Inject(CartService) private readonly cartService: CartService) {}
 
   @Cron('0 0 */2 * * *') // runs in hours that are multiples of 2
-  async deleteOldClosedCartsJob() {}
+  async deleteOldClosedCartsJob() {
+    this.cartService.deleteAllClosedNotUpdatedOnLastMonth();
+  }
 }
