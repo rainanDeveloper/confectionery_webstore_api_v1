@@ -160,14 +160,32 @@ export class CartService {
     return existentCart.id;
   }
 
+  async deleteAllClosedNotUpdatedOnLastMonth() {
+    const now = new Date();
+
+    const lastMonthDate = new Date();
+
+    lastMonthDate.setDate(now.getDate() - 30);
+
+    const carts = await this.findAllClosedSavedBefore(lastMonthDate);
+
+    if (carts.length <= 0) return;
+
+    await Promise.all(
+      carts.map((cart) => {
+        return this.delete(cart.id);
+      }),
+    );
+  }
+
   async delete(id: string) {
     const cart = await this.findOne(id, true);
 
     if (cart.itens.length > 0) {
       await Promise.all(
         // wait itens deletion
-        cart.itens.map(async (item) => {
-          await this.cartItemService.delete(item.id);
+        cart.itens.map((item) => {
+          return this.cartItemService.delete(item.id);
         }),
       );
     }
