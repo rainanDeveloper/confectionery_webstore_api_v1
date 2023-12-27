@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   NotFoundException,
+  Param,
   Post,
   Put,
   Query,
@@ -97,5 +99,41 @@ export class CartController {
     await this.cartService.updateTotal(existentCart.id);
 
     return item;
+  }
+
+  @Delete('remove/:itemId')
+  async removeItem(
+    @Req() request: Request,
+    @Body() cartItemDto: CartItemLinksDto,
+    @Param('itemId') itemId: string,
+    @Query('id') id?: string,
+  ) {
+    let existentCart: CartEntity;
+    const user = request.user as any;
+
+    if (user) {
+      existentCart = await this.cartService.findAnyOpenForCustomer(
+        user.id,
+        true,
+      );
+    }
+
+    if (id) existentCart = await this.cartService.findOne(id, true);
+
+    if (!existentCart) throw new NotFoundException(`Cart not found!`);
+
+    const existentItem = await this.cartItemService.findOneByIdAndCart(
+      itemId,
+      id,
+    );
+
+    if (!existentItem)
+      throw new NotFoundException(
+        `Couldn't find the item ${itemId} of cart ${id}`,
+      );
+
+    await this.cartItemService.delete(itemId);
+
+    return;
   }
 }

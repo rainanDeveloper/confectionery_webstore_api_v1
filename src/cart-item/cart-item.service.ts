@@ -69,6 +69,17 @@ export class CartItemService {
     return newItem;
   }
 
+  async findOneByIdAndCart(id: string, cartId: string) {
+    return await this.cartItemRepository.findOne({
+      where: {
+        id,
+        cart: {
+          id: cartId,
+        },
+      },
+    });
+  }
+
   async delete(id: string): Promise<void> {
     await this.cartItemRepository.delete({
       id,
