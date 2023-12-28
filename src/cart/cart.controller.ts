@@ -117,7 +117,7 @@ export class CartController {
       );
     }
 
-    if (id) existentCart = await this.cartService.findOne(id, true);
+    if (id) existentCart = await this.cartService.findOne(id, false);
 
     if (!existentCart) throw new NotFoundException(`Cart not found!`);
 
