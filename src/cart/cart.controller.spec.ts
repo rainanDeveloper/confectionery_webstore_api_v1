@@ -33,6 +33,8 @@ describe('CartController', () => {
           provide: CartItemService,
           useValue: {
             create: jest.fn(),
+            findOneByIdAndCart: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -273,5 +275,82 @@ describe('CartController', () => {
         },
       });
     });
+  });
+
+  describe('removeItem', () => {
+    it('should delete a cart item successfully using logged user to find a cart', async () => {
+      const itemId = randomUUID();
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        customer: {
+          id: randomUUID(),
+        },
+        total: 20,
+        status: CartStatus.OPEN,
+      } as CartEntity;
+      const cartItemMock: CartItemEntity = {
+        id: itemId,
+      } as CartItemEntity;
+
+      const requestMock = {
+        user: {
+          id: cartMock.customer.id,
+        },
+      } as any;
+
+      jest
+        .spyOn(cartService, 'findAnyOpenForCustomer')
+        .mockResolvedValueOnce(cartMock);
+      jest
+        .spyOn(cartItemService, 'findOneByIdAndCart')
+        .mockResolvedValueOnce(cartItemMock);
+
+      const result = await cartController.removeItem(requestMock, itemId);
+
+      expect(result).toBeUndefined();
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledTimes(1);
+      expect(cartService.findAnyOpenForCustomer).toHaveBeenCalledWith(
+        cartMock.customer.id,
+        false,
+      );
+      expect(cartService.findOne).not.toHaveBeenCalled();
+      expect(cartItemService.findOneByIdAndCart).toHaveBeenCalledTimes(1);
+      expect(cartItemService.findOneByIdAndCart).toHaveBeenCalledWith(
+        itemId,
+        cartMock.id,
+      );
+      expect(cartItemService.delete).toHaveBeenCalledTimes(1);
+      expect(cartItemService.delete).toHaveBeenCalledWith(itemId);
+    });
+  });
+
+  it('should delete a cart item successfully using cart id', async () => {
+    const requestMock = {} as Request;
+    const itemId = randomUUID();
+    const id = randomUUID();
+    const cartMock: CartEntity = {
+      id,
+      total: 20,
+      status: CartStatus.OPEN,
+    } as CartEntity;
+    const cartItemMock: CartItemEntity = {
+      id: itemId,
+    } as CartItemEntity;
+
+    jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+    jest
+      .spyOn(cartItemService, 'findOneByIdAndCart')
+      .mockResolvedValueOnce(cartItemMock);
+
+    const result = await cartController.removeItem(requestMock, itemId, id);
+
+    expect(result).toBeUndefined();
+    expect(cartService.findAnyOpenForCustomer).not.toHaveBeenCalled();
+    expect(cartService.findOne).toHaveBeenCalledTimes(1);
+    expect(cartService.findOne).toHaveBeenCalledWith(id, false);
+    expect(cartItemService.findOneByIdAndCart).toHaveBeenCalledTimes(1);
+    expect(cartItemService.findOneByIdAndCart).toHaveBeenCalledWith(itemId, id);
+    expect(cartItemService.delete).toHaveBeenCalledTimes(1);
+    expect(cartItemService.delete).toHaveBeenCalledWith(itemId);
   });
 });

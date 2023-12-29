@@ -113,17 +113,17 @@ export class CartController {
     if (user) {
       existentCart = await this.cartService.findAnyOpenForCustomer(
         user.id,
-        true,
+        false,
       );
     }
 
-    if (id) existentCart = await this.cartService.findOne(id, true);
+    if (id) existentCart = await this.cartService.findOne(id, false);
 
     if (!existentCart) throw new NotFoundException(`Cart not found!`);
 
     const existentItem = await this.cartItemService.findOneByIdAndCart(
       itemId,
-      id,
+      existentCart.id,
     );
 
     if (!existentItem)
