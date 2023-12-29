@@ -113,7 +113,7 @@ export class CartController {
     if (user) {
       existentCart = await this.cartService.findAnyOpenForCustomer(
         user.id,
-        true,
+        false,
       );
     }
 
@@ -123,7 +123,7 @@ export class CartController {
 
     const existentItem = await this.cartItemService.findOneByIdAndCart(
       itemId,
-      id,
+      existentCart.id,
     );
 
     if (!existentItem)
