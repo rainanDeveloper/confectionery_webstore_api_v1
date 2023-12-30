@@ -404,11 +404,6 @@ describe('CartController', () => {
       const requestMock = {} as Request;
       const itemId = randomUUID();
       const id = randomUUID();
-      const cartMock: CartEntity = {
-        id,
-        total: 20,
-        status: CartStatus.OPEN,
-      } as CartEntity;
       const cartItemMock: CartItemEntity = {
         id: itemId,
       } as CartItemEntity;
@@ -427,6 +422,38 @@ describe('CartController', () => {
           expect(cartService.findOne).toHaveBeenCalledTimes(1);
           expect(cartService.findOne).toHaveBeenCalledWith(id, false);
           expect(cartItemService.findOneByIdAndCart).not.toHaveBeenCalled();
+          expect(cartItemService.delete).not.toHaveBeenCalled();
+        });
+    });
+
+    it('should throw a not found error the informed item is not finded for the informed cart', async () => {
+      const requestMock = {} as Request;
+      const itemId = randomUUID();
+      const id = randomUUID();
+      const cartMock: CartEntity = {
+        id,
+        total: 20,
+        status: CartStatus.OPEN,
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+      jest
+        .spyOn(cartItemService, 'findOneByIdAndCart')
+        .mockResolvedValueOnce(undefined);
+
+      const resultPromise = cartController.removeItem(requestMock, itemId, id);
+
+      expect(resultPromise)
+        .rejects.toThrow(NotFoundException)
+        .then(() => {
+          expect(cartService.findAnyOpenForCustomer).not.toHaveBeenCalled();
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(id, false);
+          expect(cartItemService.findOneByIdAndCart).toHaveBeenCalledTimes(1);
+          expect(cartItemService.findOneByIdAndCart).toHaveBeenCalledWith(
+            itemId,
+            cartMock.id,
+          );
           expect(cartItemService.delete).not.toHaveBeenCalled();
         });
     });
