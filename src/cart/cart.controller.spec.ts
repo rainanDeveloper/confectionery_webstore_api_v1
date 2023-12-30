@@ -399,5 +399,36 @@ describe('CartController', () => {
           expect(cartItemService.delete).not.toHaveBeenCalled();
         });
     });
+
+    it('should throw a not found error when a cart is not finded using cart id', async () => {
+      const requestMock = {} as Request;
+      const itemId = randomUUID();
+      const id = randomUUID();
+      const cartMock: CartEntity = {
+        id,
+        total: 20,
+        status: CartStatus.OPEN,
+      } as CartEntity;
+      const cartItemMock: CartItemEntity = {
+        id: itemId,
+      } as CartItemEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(undefined);
+      jest
+        .spyOn(cartItemService, 'findOneByIdAndCart')
+        .mockResolvedValueOnce(cartItemMock);
+
+      const resultPromise = cartController.removeItem(requestMock, itemId, id);
+
+      expect(resultPromise)
+        .rejects.toThrow(NotFoundException)
+        .then(() => {
+          expect(cartService.findAnyOpenForCustomer).not.toHaveBeenCalled();
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(id, false);
+          expect(cartItemService.findOneByIdAndCart).not.toHaveBeenCalled();
+          expect(cartItemService.delete).not.toHaveBeenCalled();
+        });
+    });
   });
 });
