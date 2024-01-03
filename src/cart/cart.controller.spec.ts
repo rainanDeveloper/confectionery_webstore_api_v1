@@ -322,6 +322,8 @@ describe('CartController', () => {
       );
       expect(cartItemService.delete).toHaveBeenCalledTimes(1);
       expect(cartItemService.delete).toHaveBeenCalledWith(itemId);
+      expect(cartService.updateTotal).toHaveBeenCalledTimes(1);
+      expect(cartService.updateTotal).toHaveBeenCalledWith(cartMock.id);
     });
 
     it('should delete a cart item successfully using cart id', async () => {
@@ -355,6 +357,8 @@ describe('CartController', () => {
       );
       expect(cartItemService.delete).toHaveBeenCalledTimes(1);
       expect(cartItemService.delete).toHaveBeenCalledWith(itemId);
+      expect(cartService.updateTotal).toHaveBeenCalledTimes(1);
+      expect(cartService.updateTotal).toHaveBeenCalledWith(cartMock.id);
     });
 
     it('should throw a not found error when a cart is not finded by customer', async () => {
@@ -397,6 +401,7 @@ describe('CartController', () => {
           expect(cartService.findOne).not.toHaveBeenCalled();
           expect(cartItemService.findOneByIdAndCart).not.toHaveBeenCalled();
           expect(cartItemService.delete).not.toHaveBeenCalled();
+          expect(cartService.updateTotal).not.toHaveBeenCalled();
         });
     });
 
@@ -423,6 +428,7 @@ describe('CartController', () => {
           expect(cartService.findOne).toHaveBeenCalledWith(id, false);
           expect(cartItemService.findOneByIdAndCart).not.toHaveBeenCalled();
           expect(cartItemService.delete).not.toHaveBeenCalled();
+          expect(cartService.updateTotal).not.toHaveBeenCalled();
         });
     });
 
@@ -455,6 +461,7 @@ describe('CartController', () => {
             cartMock.id,
           );
           expect(cartItemService.delete).not.toHaveBeenCalled();
+          expect(cartService.updateTotal).not.toHaveBeenCalled();
         });
     });
   });
