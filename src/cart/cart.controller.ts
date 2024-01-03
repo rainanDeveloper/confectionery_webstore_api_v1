@@ -133,6 +133,8 @@ export class CartController {
 
     await this.cartItemService.delete(itemId);
 
+    await this.cartService.updateTotal(existentCart.id);
+
     return;
   }
 }
