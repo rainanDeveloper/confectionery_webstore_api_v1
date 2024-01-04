@@ -10,4 +10,7 @@ export class CartCronJobsService {
   async deleteOldClosedCartsJob() {
     this.cartService.deleteAllClosedNotUpdatedOnLastMonth();
   }
+
+  @Cron('0 0 0 * * *')
+  async deleteOldOpenCartsJob() {}
 }
