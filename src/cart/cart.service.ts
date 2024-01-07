@@ -138,11 +138,17 @@ export class CartService {
   async updateTotal(id: string) {
     const existentCart = await this.findOne(id, true);
 
+    if (existentCart.itens.length == 0) {
+      await this.cartRepository.delete({
+        id: existentCart.id,
+      });
+      return;
+    }
+
     existentCart.total = existentCart.itens.reduce(
-      (prevTotal, currentItem) => prevTotal + currentItem.total,
+      (prevTotal, currentItem) => Number(prevTotal) + Number(currentItem.total),
       0,
     );
-
     await this.cartRepository.save(existentCart);
   }
 
