@@ -642,6 +642,59 @@ describe('CartService', () => {
     });
   });
 
+  describe('updateTotal', () => {
+    it('should update the total of the informed cart successfully', async () => {
+      const id = randomUUID();
+      const cartMock: CartEntity = {
+        id,
+        itens: [
+          {
+            id: randomUUID(),
+            total: 20,
+          } as CartItemEntity,
+          {
+            id: randomUUID(),
+            total: 40,
+          } as CartItemEntity,
+        ],
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.updateTotal(id);
+
+      expect(result).toBeUndefined();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(id, true);
+      expect(cartRepository.save).toHaveBeenCalledTimes(1);
+      expect(cartRepository.save).toHaveBeenCalledWith({
+        id,
+        itens: cartMock.itens,
+        total: 60,
+      });
+      expect(cartRepository.delete).not.toHaveBeenCalled();
+    });
+
+    it('should delete a cart if it has no itens', async () => {
+      const id = randomUUID();
+      const cartMock: CartEntity = {
+        id,
+        itens: [],
+      } as CartEntity;
+
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const result = await cartService.updateTotal(id);
+
+      expect(result).toBeUndefined();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(id, true);
+      expect(cartRepository.save).not.toHaveBeenCalled();
+      expect(cartRepository.delete).toHaveBeenCalledTimes(1);
+      expect(cartRepository.delete).toHaveBeenCalledWith({ id });
+    });
+  });
+
   describe('close', () => {
     it('should close a open cart successfully', async () => {
       const nowMock = new Date();
