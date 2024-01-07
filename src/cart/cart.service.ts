@@ -126,14 +126,29 @@ export class CartService {
     });
   }
 
+  async findAllOpenSavedBefore(date: Date) {
+    return this.cartRepository.find({
+      where: {
+        updatedAt: LessThan(date),
+        status: CartStatus.OPEN,
+      },
+    });
+  }
+
   async updateTotal(id: string) {
     const existentCart = await this.findOne(id, true);
 
+    if (existentCart.itens.length == 0) {
+      await this.cartRepository.delete({
+        id: existentCart.id,
+      });
+      return;
+    }
+
     existentCart.total = existentCart.itens.reduce(
-      (prevTotal, currentItem) => prevTotal + currentItem.total,
+      (prevTotal, currentItem) => Number(prevTotal) + Number(currentItem.total),
       0,
     );
-
     await this.cartRepository.save(existentCart);
   }
 
@@ -165,9 +180,27 @@ export class CartService {
 
     const lastMonthDate = new Date();
 
-    lastMonthDate.setDate(now.getDate() - 30);
+    lastMonthDate.setMonth(now.getMonth() - 1);
 
     const carts = await this.findAllClosedSavedBefore(lastMonthDate);
+
+    if (carts.length <= 0) return;
+
+    await Promise.all(
+      carts.map((cart) => {
+        return this.delete(cart.id);
+      }),
+    );
+  }
+
+  async deleteAllOpenNotUpdatedOnLastThreeMonths() {
+    const now = new Date();
+
+    const lastMonthDate = new Date();
+
+    lastMonthDate.setMonth(now.getMonth() - 3);
+
+    const carts = await this.findAllOpenSavedBefore(lastMonthDate);
 
     if (carts.length <= 0) return;
 
