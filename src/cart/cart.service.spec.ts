@@ -789,7 +789,7 @@ describe('CartService', () => {
   describe('deleteAllClosedNotUpdatedOnLastMonth', () => {
     it('should delete all closed carts not updated on last month', async () => {
       const mockLastMonth = new Date('2022-01-20');
-      MockDate.set('2022-02-19');
+      MockDate.set('2022-02-20');
       const cartsMock: CartEntity[] = [
         {
           id: randomUUID(),
@@ -825,7 +825,7 @@ describe('CartService', () => {
 
     it('should return when no carts are found', async () => {
       const mockLastMonth = new Date('2022-01-20');
-      MockDate.set('2022-02-19');
+      MockDate.set('2022-02-20');
       const cartsMock: CartEntity[] = [];
 
       jest
@@ -836,6 +836,63 @@ describe('CartService', () => {
 
       expect(cartService.findAllClosedSavedBefore).toHaveBeenCalledTimes(1);
       expect(cartService.findAllClosedSavedBefore).toHaveBeenCalledWith(
+        mockLastMonth,
+      );
+      expect(cartService.delete).not.toHaveBeenCalled();
+      MockDate.reset();
+    });
+  });
+
+  describe('deleteAllOpenNotUpdatedOnLastThreeMonths', () => {
+    it('should delete all open carts not updated on last 3 months', async () => {
+      const mockLastThreeMonths = new Date('2022-01-12');
+      MockDate.set('2022-04-12');
+      const cartsMock: CartEntity[] = [
+        {
+          id: randomUUID(),
+          itens: [],
+          status: CartStatus.CLOSED,
+          createdAt: new Date('2021-09-09'),
+          updatedAt: new Date('2021-09-09'),
+        } as CartEntity,
+        {
+          id: randomUUID(),
+          itens: [],
+          status: CartStatus.CLOSED,
+          createdAt: new Date('2021-03-21'),
+          updatedAt: new Date('2021-04-12'),
+        } as CartEntity,
+      ];
+
+      jest
+        .spyOn(cartService, 'findAllOpenSavedBefore')
+        .mockResolvedValueOnce(cartsMock);
+      jest.spyOn(cartService, 'delete').mockResolvedValue();
+      await cartService.deleteAllOpenNotUpdatedOnLastThreeMonths();
+
+      expect(cartService.findAllOpenSavedBefore).toHaveBeenCalledTimes(1);
+      expect(cartService.findAllOpenSavedBefore).toHaveBeenCalledWith(
+        mockLastThreeMonths,
+      );
+      expect(cartService.delete).toHaveBeenCalledTimes(2);
+      expect(cartService.delete).toHaveBeenNthCalledWith(1, cartsMock[0].id);
+      expect(cartService.delete).toHaveBeenNthCalledWith(2, cartsMock[1].id);
+      MockDate.reset();
+    });
+
+    it('should return when no carts are found', async () => {
+      const mockLastMonth = new Date('2022-01-12');
+      MockDate.set('2022-04-12');
+      const cartsMock: CartEntity[] = [];
+
+      jest
+        .spyOn(cartService, 'findAllOpenSavedBefore')
+        .mockResolvedValueOnce(cartsMock);
+      jest.spyOn(cartService, 'delete').mockResolvedValue();
+      await cartService.deleteAllOpenNotUpdatedOnLastThreeMonths();
+
+      expect(cartService.findAllOpenSavedBefore).toHaveBeenCalledTimes(1);
+      expect(cartService.findAllOpenSavedBefore).toHaveBeenCalledWith(
         mockLastMonth,
       );
       expect(cartService.delete).not.toHaveBeenCalled();

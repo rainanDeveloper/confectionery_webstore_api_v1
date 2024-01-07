@@ -174,9 +174,27 @@ export class CartService {
 
     const lastMonthDate = new Date();
 
-    lastMonthDate.setDate(now.getDate() - 30);
+    lastMonthDate.setMonth(now.getMonth() - 1);
 
     const carts = await this.findAllClosedSavedBefore(lastMonthDate);
+
+    if (carts.length <= 0) return;
+
+    await Promise.all(
+      carts.map((cart) => {
+        return this.delete(cart.id);
+      }),
+    );
+  }
+
+  async deleteAllOpenNotUpdatedOnLastThreeMonths() {
+    const now = new Date();
+
+    const lastMonthDate = new Date();
+
+    lastMonthDate.setMonth(now.getMonth() - 3);
+
+    const carts = await this.findAllOpenSavedBefore(lastMonthDate);
 
     if (carts.length <= 0) return;
 
