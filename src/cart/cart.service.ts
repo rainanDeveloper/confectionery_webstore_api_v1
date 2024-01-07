@@ -126,6 +126,15 @@ export class CartService {
     });
   }
 
+  async findAllOpenSavedBefore(date: Date) {
+    return this.cartRepository.find({
+      where: {
+        updatedAt: LessThan(date),
+        status: CartStatus.OPEN,
+      },
+    });
+  }
+
   async updateTotal(id: string) {
     const existentCart = await this.findOne(id, true);
 
