@@ -19,7 +19,7 @@ import {
   CartItemLinksDto,
   CreateCartServiceDto,
 } from './dtos/create-cart-service.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OptionalJwtCustomerGuard } from 'src/customer-auth/guards/optional-jwt-customer.guard';
 import { CartEntity } from './entities/cart.entity';
 import { CartItemService } from 'src/cart-item/cart-item.service';
@@ -27,6 +27,7 @@ import { CartItemService } from 'src/cart-item/cart-item.service';
 @Controller('cart')
 @ApiTags('Cart')
 @UseGuards(OptionalJwtCustomerGuard)
+@ApiBearerAuth()
 export class CartController {
   constructor(
     @Inject(CartService) private readonly cartService: CartService,
