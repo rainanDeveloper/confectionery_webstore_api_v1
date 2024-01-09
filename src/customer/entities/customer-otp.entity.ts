@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm';
 
 @Entity('customer_otp')
-export class CustomerOtp {
+export class CustomerOtpEntity {
   @Column()
   otp: string;
 
