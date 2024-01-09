@@ -18,6 +18,7 @@ import { CartItemModule } from './cart-item/cart-item.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CartCronJobsService } from './cart-cron-jobs/cart-cron-jobs.service';
 import { CartCronJobsModule } from './cart-cron-jobs/cart-cron-jobs.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CartCronJobsModule } from './cart-cron-jobs/cart-cron-jobs.module';
     CartModule,
     CartItemModule,
     CartCronJobsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService, CartCronJobsService],
