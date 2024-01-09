@@ -1,9 +1,9 @@
-import { CustomerOtp } from './customer-otp.entity';
+import { CustomerOtpEntity } from './customer-otp.entity';
 
-describe('CustomerOtp', () => {
+describe('CustomerOtpEntity', () => {
   it('Should create a new customerOtp record', async () => {
-    const customerOtp = new CustomerOtp();
+    const customerOtp = new CustomerOtpEntity();
 
-    expect(customerOtp).toBeInstanceOf(CustomerOtp);
+    expect(customerOtp).toBeInstanceOf(CustomerOtpEntity);
   });
 });
