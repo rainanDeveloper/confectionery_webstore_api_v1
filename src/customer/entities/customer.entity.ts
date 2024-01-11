@@ -56,6 +56,9 @@ export class CustomerEntity {
   @OneToMany(() => CustomerAddressEntity, (address) => address.customer)
   addresses: CustomerAddressEntity;
 
+  @Column({ name: 'is_active', type: 'boolean' })
+  isActive: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
