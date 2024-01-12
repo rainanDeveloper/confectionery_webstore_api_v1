@@ -4,18 +4,26 @@ import { Repository } from 'typeorm';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { UpdateCustomerDto } from './dtos/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class CustomerService {
   constructor(
     @InjectRepository(CustomerEntity)
     private readonly customerRepository: Repository<CustomerEntity>,
+    @InjectRepository(MailService)
+    private readonly mailService: MailService,
   ) {}
 
   async create(customerDto: CreateCustomerDto): Promise<string> {
     const newUser = this.customerRepository.create(customerDto);
 
     await this.customerRepository.save(newUser);
+
+    await this.mailService.sendCustomerConfirmationEmail({
+      login: newUser.login,
+      email: newUser.email,
+    });
 
     return newUser.id;
   }
