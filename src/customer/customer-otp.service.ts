@@ -11,11 +11,21 @@ export class CustomerOtpService {
     private readonly customerOtpRepository: Repository<CustomerOtpEntity>,
   ) {}
 
-  async create(createCustomerOtpDto: CreateCustomerOtpDto) {
+  async create(
+    createCustomerOtpDto: CreateCustomerOtpDto,
+  ): Promise<CustomerOtpEntity> {
     const createdOtp = this.customerOtpRepository.create(createCustomerOtpDto);
 
     await this.customerOtpRepository.save(createdOtp);
 
     return createdOtp;
+  }
+
+  async findOne(otp: string): Promise<CustomerOtpEntity> {
+    return await this.customerOtpRepository.findOne({
+      where: {
+        otp,
+      },
+    });
   }
 }
