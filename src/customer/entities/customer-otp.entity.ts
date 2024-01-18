@@ -1,8 +1,14 @@
-import { Column, CreateDateColumn, Entity, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('customer_otp')
 export class CustomerOtpEntity {
-  @Column()
+  @PrimaryColumn()
   otp: string;
 
   @Column()
