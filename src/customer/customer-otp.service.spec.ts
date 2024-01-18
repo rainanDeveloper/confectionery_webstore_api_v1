@@ -45,7 +45,7 @@ describe('CustomerOtpService', () => {
 
       const customerOtpMock: CustomerOtpEntity = {
         ...customerOtpDto,
-      };
+      } as CustomerOtpEntity;
 
       jest
         .spyOn(customerOtpRepository, 'create')
@@ -67,7 +67,7 @@ describe('CustomerOtpService', () => {
       const customerOtpMock: CustomerOtpEntity = {
         otp: otpMock,
         email: 'some@email.example',
-      };
+      } as CustomerOtpEntity;
 
       jest
         .spyOn(customerOtpRepository, 'findOne')

@@ -110,7 +110,7 @@ describe('CustomerService', () => {
       const customerOtpMock: CustomerOtpEntity = {
         otp: otpMock,
         email: 'some@email.example',
-      };
+      } as CustomerOtpEntity;
       const customerMock: CustomerEntity = {
         id: randomUUID(),
         email: customerOtpMock.email,
@@ -167,7 +167,7 @@ describe('CustomerService', () => {
       const customerOtpMock: CustomerOtpEntity = {
         otp: otpMock,
         email: 'some@email.example',
-      };
+      } as CustomerOtpEntity;
       jest
         .spyOn(customerOtpService, 'findOne')
         .mockResolvedValueOnce(customerOtpMock);
