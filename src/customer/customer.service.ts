@@ -49,6 +49,7 @@ export class CustomerService {
     customer.isActive = true;
 
     await this.customerRepository.save(customer);
+    await this.customerOtpService.delete(otp);
   }
 
   async findOne(id: string): Promise<CustomerEntity> {
