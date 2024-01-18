@@ -28,4 +28,10 @@ export class CustomerOtpService {
       },
     });
   }
+
+  async delete(otp: string) {
+    await this.customerOtpRepository.delete({
+      otp,
+    });
+  }
 }

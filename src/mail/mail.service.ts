@@ -16,6 +16,7 @@ export class MailService {
 
   async sendCustomerConfirmationEmail(
     customerConfirmationDto: CustomerConfirmationDto,
+    langs?: string[],
   ) {
     const otp = randomUUID();
 
@@ -28,10 +29,18 @@ export class MailService {
       'APPLICATION_HOST',
     )}/confirmEmail/${otp}`;
 
+    let template = 'customer-email-confirmation';
+    let subject = 'Confirm your email';
+    if (langs?.length > 0 && langs.includes('pt-BR')) {
+      template += '.pt-br.hbs';
+      subject = 'Confirme seu email';
+    }
+
     this.mailerService.sendMail({
       to: customerConfirmationDto.email,
-      subject: 'Confirm your email',
-      template: 'customer-email-confirmation',
+      from: this.configService.getOrThrow('SMTP_EMAIL'),
+      subject,
+      template,
       context: {
         customer: customerConfirmationDto,
         otp_url,
