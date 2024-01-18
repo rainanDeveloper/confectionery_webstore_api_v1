@@ -32,11 +32,9 @@ export class MailService {
 
     let template = 'customer-email-confirmation';
     let subject = 'Confirm your email';
-    if (langs?.length > 0) {
-      if (langs.includes('pt-BR')) {
-        template += '.pt-br.hbs';
-        subject = 'Confirme seu email';
-      }
+    if (langs?.length > 0 && langs.includes('pt-BR')) {
+      template += '.pt-br.hbs';
+      subject = 'Confirme seu email';
     }
 
     this.mailerService.sendMail({
