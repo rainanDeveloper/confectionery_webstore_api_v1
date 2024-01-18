@@ -61,7 +61,11 @@ export class CustomerController {
 
   @Get('confirmEmail/:otp')
   @ApiNoContentResponse({
-    description: 'NO CONTENT: Customer updated sucessfully',
+    description: 'NO CONTENT: Customer activated sucessfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'NOT FOUND: otp/customer not found',
+    type: NotFoundErrorDto,
   })
   async confirmEmail(@Param('otp') otp: string) {
     await this.customerService.activateUser(otp);
