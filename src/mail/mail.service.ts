@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CustomerOtpService } from 'src/customer/customer-otp.service';
+import { template } from 'handlebars';
 
 @Injectable()
 export class MailService {
@@ -16,6 +17,7 @@ export class MailService {
 
   async sendCustomerConfirmationEmail(
     customerConfirmationDto: CustomerConfirmationDto,
+    langs?: string[],
   ) {
     const otp = randomUUID();
 
@@ -28,11 +30,20 @@ export class MailService {
       'APPLICATION_HOST',
     )}/confirmEmail/${otp}`;
 
+    let template = 'customer-email-confirmation';
+    let subject = 'Confirm your email';
+    if (langs?.length > 0) {
+      if (langs.includes('pt-BR')) {
+        template += '.pt-br.hbs';
+        subject = 'Confirme seu email';
+      }
+    }
+
     this.mailerService.sendMail({
       to: customerConfirmationDto.email,
       from: this.configService.getOrThrow('SMTP_EMAIL'),
-      subject: 'Confirm your email',
-      template: 'customer-email-confirmation',
+      subject,
+      template,
       context: {
         customer: customerConfirmationDto,
         otp_url,

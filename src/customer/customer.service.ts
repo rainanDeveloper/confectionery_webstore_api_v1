@@ -18,15 +18,21 @@ export class CustomerService {
     private readonly customerOtpService: CustomerOtpService,
   ) {}
 
-  async create(customerDto: CreateCustomerDto): Promise<string> {
+  async create(
+    customerDto: CreateCustomerDto,
+    langs?: string[],
+  ): Promise<string> {
     const newUser = this.customerRepository.create(customerDto);
 
     await this.customerRepository.save(newUser);
 
-    await this.mailService.sendCustomerConfirmationEmail({
-      login: newUser.login,
-      email: newUser.email,
-    });
+    await this.mailService.sendCustomerConfirmationEmail(
+      {
+        login: newUser.login,
+        email: newUser.email,
+      },
+      langs,
+    );
 
     return newUser.id;
   }

@@ -45,10 +45,13 @@ export class CustomerController {
     type: ValidationErrorDto,
   })
   async create(
+    @Req() request: Request,
     @Body() customerDto: CreateCustomerDto,
     @Res() response: Response,
   ) {
-    const customerId = await this.customerService.create(customerDto);
+    const langs = request.headers['accept-language']?.split(';')[0]?.split(',');
+    let customerId;
+    customerId = await this.customerService.create(customerDto, langs);
 
     const getUrl = `customer/${customerId}`;
 
