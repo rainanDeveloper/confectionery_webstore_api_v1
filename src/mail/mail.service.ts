@@ -30,6 +30,7 @@ export class MailService {
 
     this.mailerService.sendMail({
       to: customerConfirmationDto.email,
+      from: this.configService.getOrThrow('SMTP_EMAIL'),
       subject: 'Confirm your email',
       template: 'customer-email-confirmation',
       context: {

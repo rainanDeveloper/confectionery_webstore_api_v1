@@ -11,24 +11,28 @@ import { CustomerModule } from 'src/customer/customer.module';
     ConfigModule.forRoot(),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        transport: {
-          host: configService.getOrThrow('SMTP_HOST'),
-          port: parseInt(configService.getOrThrow('SMTP_PORT')),
-          secure: Boolean(configService.getOrThrow('SMTP_SECURE')),
-          auth: {
-            user: configService.getOrThrow('SMTP_USER'),
-            pass: configService.getOrThrow('SMTP_PASS'),
+      useFactory: (configService: ConfigService) => {
+        const secure = configService.getOrThrow('SMTP_SECURE') === 'true';
+        const config = {
+          transport: {
+            host: configService.getOrThrow('SMTP_HOST'),
+            port: parseInt(configService.getOrThrow('SMTP_PORT')),
+            secure,
+            auth: {
+              user: configService.getOrThrow('SMTP_USER'),
+              pass: configService.getOrThrow('SMTP_PASS'),
+            },
           },
-        },
-        template: {
-          dir: join(process.cwd(), 'src', 'mail', 'templates'),
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
+          template: {
+            dir: join(process.cwd(), 'src', 'mail', 'templates'),
+            adapter: new HandlebarsAdapter(),
+            options: {
+              strict: true,
+            },
           },
-        },
-      }),
+        };
+        return config;
+      },
       inject: [ConfigService],
     }),
     forwardRef(() => CustomerModule),
