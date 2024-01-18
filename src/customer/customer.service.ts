@@ -1,18 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { UpdateCustomerDto } from './dtos/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
 import { MailService } from 'src/mail/mail.service';
+import { CustomerOtpService } from './customer-otp.service';
 
 @Injectable()
 export class CustomerService {
   constructor(
     @InjectRepository(CustomerEntity)
     private readonly customerRepository: Repository<CustomerEntity>,
-    @InjectRepository(MailService)
+    @Inject(MailService)
     private readonly mailService: MailService,
+    @Inject(CustomerOtpService)
+    private readonly customerOtpService: CustomerOtpService,
   ) {}
 
   async create(customerDto: CreateCustomerDto): Promise<string> {
@@ -26,6 +29,26 @@ export class CustomerService {
     });
 
     return newUser.id;
+  }
+
+  async activateUser(otp: string) {
+    const otpRecord = await this.customerOtpService.findOne(otp);
+
+    if (!otpRecord) {
+      throw new NotFoundException(`Customer with informed otp not found!`);
+    }
+
+    const { email } = otpRecord;
+
+    const customer = await this.findOneByLoginOrEmail(email);
+
+    if (!customer) {
+      throw new NotFoundException(`Customer with informed otp not found!`);
+    }
+
+    customer.isActive = true;
+
+    await this.customerRepository.save(customer);
   }
 
   async findOne(id: string): Promise<CustomerEntity> {
