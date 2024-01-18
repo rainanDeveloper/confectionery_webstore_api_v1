@@ -136,6 +136,8 @@ describe('CustomerService', () => {
         ...customerMock,
         isActive: true,
       });
+      expect(customerOtpService.delete).toHaveBeenCalledTimes(1);
+      expect(customerOtpService.delete).toHaveBeenCalledWith(otpMock);
     });
 
     it('should throw a NotFoundException when the otp is not found', async () => {
@@ -156,6 +158,38 @@ describe('CustomerService', () => {
           expect(customerOtpService.findOne).toHaveBeenCalledWith(otpMock);
           expect(customerService.findOneByLoginOrEmail).not.toHaveBeenCalled();
           expect(customerRepository.save).not.toHaveBeenCalled();
+          expect(customerOtpService.delete).not.toHaveBeenCalled();
+        });
+    });
+
+    it('should throw a NotFoundException when the otp is not found', async () => {
+      const otpMock = randomUUID();
+      const customerOtpMock: CustomerOtpEntity = {
+        otp: otpMock,
+        email: 'some@email.example',
+      };
+      jest
+        .spyOn(customerOtpService, 'findOne')
+        .mockResolvedValueOnce(customerOtpMock);
+      jest
+        .spyOn(customerService, 'findOneByLoginOrEmail')
+        .mockResolvedValueOnce(undefined);
+
+      const resultPromise = customerService.activateUser(otpMock);
+
+      expect(resultPromise)
+        .rejects.toThrow(NotFoundException)
+        .then(() => {
+          expect(customerOtpService.findOne).toHaveBeenCalledTimes(1);
+          expect(customerOtpService.findOne).toHaveBeenCalledWith(otpMock);
+          expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledTimes(
+            1,
+          );
+          expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledWith(
+            customerOtpMock.email,
+          );
+          expect(customerRepository.save).not.toHaveBeenCalled();
+          expect(customerOtpService.delete).not.toHaveBeenCalled();
         });
     });
   });
