@@ -27,7 +27,7 @@ export class MailService {
 
     const otp_url = `${this.configService.getOrThrow(
       'APPLICATION_HOST',
-    )}/confirmEmail/${otp}`;
+    )}/api/confirmEmail/${otp}`;
 
     let template = 'customer-email-confirmation';
     let subject = 'Confirm your email';
