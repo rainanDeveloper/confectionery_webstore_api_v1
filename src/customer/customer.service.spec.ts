@@ -8,6 +8,7 @@ import { UpdateCustomerDto } from './dtos/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
 import { CustomerOtpService } from './customer-otp.service';
 import { MailService } from 'src/mail/mail.service';
+import { CustomerOtpEntity } from './entities/customer-otp.entity';
 
 describe('CustomerService', () => {
   let customerService: CustomerService;
@@ -99,6 +100,36 @@ describe('CustomerService', () => {
         login: customerDto.login,
         email: customerDto.email,
       });
+    });
+  });
+
+  describe('activateUser', () => {
+    it('should activate customer sucessfully', async () => {
+      const otpMock = randomUUID();
+      const customerOtpMock: CustomerOtpEntity = {
+        otp: otpMock,
+        email: 'some@email.example',
+      };
+      const customerMock: CustomerEntity = {
+        id: randomUUID(),
+        email: customerOtpMock.email,
+      } as CustomerEntity;
+      jest
+        .spyOn(customerOtpService, 'findOne')
+        .mockResolvedValueOnce(customerOtpMock);
+      jest
+        .spyOn(customerService, 'findOneByLoginOrEmail')
+        .mockResolvedValueOnce(customerMock);
+
+      const result = await customerService.activateUser(otpMock);
+
+      expect(result).toBeUndefined();
+      expect(customerOtpService.findOne).toHaveBeenCalledTimes(1);
+      expect(customerOtpService.findOne).toHaveBeenCalledWith(otpMock);
+      expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledTimes(1);
+      expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledWith(
+        customerOtpMock.email,
+      );
     });
   });
 
