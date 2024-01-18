@@ -6,10 +6,16 @@ import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { UpdateCustomerDto } from './dtos/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
+import { CustomerOtpService } from './customer-otp.service';
+import { MailService } from 'src/mail/mail.service';
+import { CustomerOtpEntity } from './entities/customer-otp.entity';
+import { NotFoundException } from '@nestjs/common';
 
 describe('CustomerService', () => {
   let customerService: CustomerService;
   let customerRepository: Repository<CustomerEntity>;
+  let customerOtpService: CustomerOtpService;
+  let mailService: MailService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,6 +31,18 @@ describe('CustomerService', () => {
             delete: jest.fn(),
           },
         },
+        {
+          provide: CustomerOtpService,
+          useValue: {
+            findOne: jest.fn(),
+          },
+        },
+        {
+          provide: MailService,
+          useValue: {
+            sendCustomerConfirmationEmail: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -32,11 +50,15 @@ describe('CustomerService', () => {
     customerRepository = module.get<Repository<CustomerEntity>>(
       getRepositoryToken(CustomerEntity),
     );
+    customerOtpService = module.get<CustomerOtpService>(CustomerOtpService);
+    mailService = module.get<MailService>(MailService);
   });
 
   it('should be defined', () => {
     expect(customerService).toBeDefined();
     expect(customerRepository).toBeDefined();
+    expect(customerOtpService).toBeDefined();
+    expect(mailService).toBeDefined();
   });
 
   describe('create', () => {
@@ -72,6 +94,69 @@ describe('CustomerService', () => {
       expect(customerRepository.create).toHaveBeenCalledTimes(1);
       expect(customerRepository.save).toHaveBeenCalledWith(customerMock);
       expect(customerRepository.save).toHaveBeenCalledTimes(1);
+      expect(mailService.sendCustomerConfirmationEmail).toHaveBeenCalledTimes(
+        1,
+      );
+      expect(mailService.sendCustomerConfirmationEmail).toHaveBeenCalledWith({
+        login: customerDto.login,
+        email: customerDto.email,
+      });
+    });
+  });
+
+  describe('activateUser', () => {
+    it('should activate customer sucessfully', async () => {
+      const otpMock = randomUUID();
+      const customerOtpMock: CustomerOtpEntity = {
+        otp: otpMock,
+        email: 'some@email.example',
+      };
+      const customerMock: CustomerEntity = {
+        id: randomUUID(),
+        email: customerOtpMock.email,
+      } as CustomerEntity;
+      jest
+        .spyOn(customerOtpService, 'findOne')
+        .mockResolvedValueOnce(customerOtpMock);
+      jest
+        .spyOn(customerService, 'findOneByLoginOrEmail')
+        .mockResolvedValueOnce(customerMock);
+
+      const result = await customerService.activateUser(otpMock);
+
+      expect(result).toBeUndefined();
+      expect(customerOtpService.findOne).toHaveBeenCalledTimes(1);
+      expect(customerOtpService.findOne).toHaveBeenCalledWith(otpMock);
+      expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledTimes(1);
+      expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledWith(
+        customerOtpMock.email,
+      );
+      expect(customerRepository.save).toHaveBeenCalledTimes(1);
+      expect(customerRepository.save).toHaveBeenCalledWith({
+        ...customerMock,
+        isActive: true,
+      });
+    });
+
+    it('should throw a NotFoundException when the otp is not found', async () => {
+      const otpMock = randomUUID();
+      jest
+        .spyOn(customerOtpService, 'findOne')
+        .mockResolvedValueOnce(undefined);
+      jest
+        .spyOn(customerService, 'findOneByLoginOrEmail')
+        .mockResolvedValueOnce(undefined);
+
+      const resultPromise = customerService.activateUser(otpMock);
+
+      expect(resultPromise)
+        .rejects.toThrow(NotFoundException)
+        .then(() => {
+          expect(customerOtpService.findOne).toHaveBeenCalledTimes(1);
+          expect(customerOtpService.findOne).toHaveBeenCalledWith(otpMock);
+          expect(customerService.findOneByLoginOrEmail).not.toHaveBeenCalled();
+          expect(customerRepository.save).not.toHaveBeenCalled();
+        });
     });
   });
 

@@ -18,6 +18,7 @@ describe('CustomerOtpService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            findOne: jest.fn(),
           },
         },
       ],
@@ -56,6 +57,30 @@ describe('CustomerOtpService', () => {
       expect(customerOtpRepository.create).toHaveBeenCalledWith(customerOtpDto);
       expect(customerOtpRepository.save).toHaveBeenCalledTimes(1);
       expect(customerOtpRepository.save).toHaveBeenCalledWith(customerOtpMock);
+    });
+  });
+
+  describe('findOne', () => {
+    it('Should find a customer otp successfully', async () => {
+      const otpMock = randomUUID();
+      const customerOtpMock: CustomerOtpEntity = {
+        otp: otpMock,
+        email: 'some@email.example',
+      };
+
+      jest
+        .spyOn(customerOtpRepository, 'findOne')
+        .mockResolvedValueOnce(customerOtpMock);
+
+      const result = await customerOtpService.findOne(otpMock);
+
+      expect(result).toStrictEqual(customerOtpMock);
+      expect(customerOtpRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(customerOtpRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          otp: otpMock,
+        },
+      });
     });
   });
 });
