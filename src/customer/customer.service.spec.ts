@@ -6,10 +6,14 @@ import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dtos/create-customer.dto';
 import { UpdateCustomerDto } from './dtos/update-customer.dto';
 import { CustomerEntity } from './entities/customer.entity';
+import { CustomerOtpService } from './customer-otp.service';
+import { MailService } from 'src/mail/mail.service';
 
 describe('CustomerService', () => {
   let customerService: CustomerService;
   let customerRepository: Repository<CustomerEntity>;
+  let customerOtpService: CustomerOtpService;
+  let mailService: MailService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,6 +29,18 @@ describe('CustomerService', () => {
             delete: jest.fn(),
           },
         },
+        {
+          provide: CustomerOtpService,
+          useValue: {
+            findOne: jest.fn(),
+          },
+        },
+        {
+          provide: MailService,
+          useValue: {
+            sendCustomerConfirmationEmail: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -32,11 +48,15 @@ describe('CustomerService', () => {
     customerRepository = module.get<Repository<CustomerEntity>>(
       getRepositoryToken(CustomerEntity),
     );
+    customerOtpService = module.get<CustomerOtpService>(CustomerOtpService);
+    mailService = module.get<MailService>(MailService);
   });
 
   it('should be defined', () => {
     expect(customerService).toBeDefined();
     expect(customerRepository).toBeDefined();
+    expect(customerOtpService).toBeDefined();
+    expect(mailService).toBeDefined();
   });
 
   describe('create', () => {
@@ -72,6 +92,13 @@ describe('CustomerService', () => {
       expect(customerRepository.create).toHaveBeenCalledTimes(1);
       expect(customerRepository.save).toHaveBeenCalledWith(customerMock);
       expect(customerRepository.save).toHaveBeenCalledTimes(1);
+      expect(mailService.sendCustomerConfirmationEmail).toHaveBeenCalledTimes(
+        1,
+      );
+      expect(mailService.sendCustomerConfirmationEmail).toHaveBeenCalledWith({
+        login: customerDto.login,
+        email: customerDto.email,
+      });
     });
   });
 
