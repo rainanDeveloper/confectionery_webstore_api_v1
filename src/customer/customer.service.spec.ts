@@ -9,6 +9,7 @@ import { CustomerEntity } from './entities/customer.entity';
 import { CustomerOtpService } from './customer-otp.service';
 import { MailService } from 'src/mail/mail.service';
 import { CustomerOtpEntity } from './entities/customer-otp.entity';
+import { NotFoundException } from '@nestjs/common';
 
 describe('CustomerService', () => {
   let customerService: CustomerService;
@@ -130,6 +131,32 @@ describe('CustomerService', () => {
       expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledWith(
         customerOtpMock.email,
       );
+      expect(customerRepository.save).toHaveBeenCalledTimes(1);
+      expect(customerRepository.save).toHaveBeenCalledWith({
+        ...customerMock,
+        isActive: true,
+      });
+    });
+
+    it('should throw a NotFoundException when the otp is not found', async () => {
+      const otpMock = randomUUID();
+      jest
+        .spyOn(customerOtpService, 'findOne')
+        .mockResolvedValueOnce(undefined);
+      jest
+        .spyOn(customerService, 'findOneByLoginOrEmail')
+        .mockResolvedValueOnce(undefined);
+
+      const resultPromise = customerService.activateUser(otpMock);
+
+      expect(resultPromise)
+        .rejects.toThrow(NotFoundException)
+        .then(() => {
+          expect(customerOtpService.findOne).toHaveBeenCalledTimes(1);
+          expect(customerOtpService.findOne).toHaveBeenCalledWith(otpMock);
+          expect(customerService.findOneByLoginOrEmail).not.toHaveBeenCalled();
+          expect(customerRepository.save).not.toHaveBeenCalled();
+        });
     });
   });
 
