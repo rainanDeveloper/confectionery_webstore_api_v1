@@ -19,6 +19,7 @@ describe('CustomerOtpService', () => {
             create: jest.fn(),
             save: jest.fn(),
             findOne: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -80,6 +81,19 @@ describe('CustomerOtpService', () => {
         where: {
           otp: otpMock,
         },
+      });
+    });
+  });
+
+  describe('delete', () => {
+    it('Should delete a otp record', async () => {
+      const otpMock = randomUUID();
+      const result = await customerOtpService.delete(otpMock);
+
+      expect(result).toBeUndefined();
+      expect(customerOtpRepository.delete).toHaveBeenCalledTimes(1);
+      expect(customerOtpRepository.delete).toHaveBeenCalledWith({
+        otp: otpMock,
       });
     });
   });
