@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CustomerOtpService } from 'src/customer/customer-otp.service';
-import { template } from 'handlebars';
 
 @Injectable()
 export class MailService {
