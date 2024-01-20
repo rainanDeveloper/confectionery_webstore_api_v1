@@ -1,8 +1,16 @@
 export enum OrderStatus {
-  OPEN,
-  PAID,
-  DELIVERING,
-  DELIVERED,
-  RETURNING,
-  FINISHED,
+  OPEN = 'OPEN',
+  PAID = 'PAID',
+  DELIVERING = 'DELIVERING',
+  DELIVERED = 'DELIVERED',
+  RETURNING = 'RETURNING',
+  FINISHED = 'FINISHED',
 }
+
+export const OrderStatusTransitions = {
+  OPEN: ['PAID'],
+  PAID: ['DELIVERING'],
+  DELIVERING: ['DELIVERED'],
+  DELIVERED: ['RETURNING', 'FINISHED'],
+  RETURNING: ['FINISHED'],
+};
