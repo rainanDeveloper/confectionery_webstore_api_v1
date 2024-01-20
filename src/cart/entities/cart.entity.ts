@@ -35,7 +35,7 @@ export class CartEntity {
   })
   total: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   status: CartStatus;
 
   @CreateDateColumn({ name: 'created_at' })

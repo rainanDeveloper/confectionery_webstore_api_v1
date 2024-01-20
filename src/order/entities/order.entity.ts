@@ -26,7 +26,7 @@ export class OrderEntity {
   })
   total: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   status: OrderStatus;
 
   @CreateDateColumn({ name: 'created_at' })
