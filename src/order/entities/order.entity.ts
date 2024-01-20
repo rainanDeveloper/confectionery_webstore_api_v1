@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { OrderStatus } from '../enum/order-status.enum';
 
 @Entity('order')
 export class OrderEntity {
@@ -24,6 +25,9 @@ export class OrderEntity {
     default: 0,
   })
   total: number;
+
+  @Column()
+  status: OrderStatus;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
