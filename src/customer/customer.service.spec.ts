@@ -162,7 +162,7 @@ describe('CustomerService', () => {
         });
     });
 
-    it('should throw a NotFoundException when the otp is not found', async () => {
+    it('should throw a NotFoundException when the customer is not found', async () => {
       const otpMock = randomUUID();
       const customerOtpMock: CustomerOtpEntity = {
         otp: otpMock,

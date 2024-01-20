@@ -66,6 +66,10 @@ describe('CustomerController', () => {
       });
       const headerMock = jest.fn().mockReturnValue({ status: statusMock });
 
+      const requestMock = {
+        headers: {},
+      } as any;
+
       const responseMock = {
         header: headerMock,
       } as any;
@@ -76,7 +80,11 @@ describe('CustomerController', () => {
         .spyOn(customerService, 'create')
         .mockResolvedValueOnce(customerMockId);
 
-      const result = await customerController.create(customerDto, responseMock);
+      const result = await customerController.create(
+        requestMock,
+        customerDto,
+        responseMock,
+      );
 
       expect(result).toBeUndefined();
       expect(customerService.create).toHaveBeenCalledTimes(1);

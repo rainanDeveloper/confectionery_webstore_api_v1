@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Inject,
+  Param,
   Patch,
   Post,
   Req,
@@ -56,6 +57,19 @@ export class CustomerController {
     const getUrl = `customer/${customerId}`;
 
     response.header('location', getUrl).status(HttpStatus.CREATED).send();
+  }
+
+  @Get('confirmEmail/:otp')
+  @ApiNoContentResponse({
+    description: 'NO CONTENT: Customer activated sucessfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'NOT FOUND: otp/customer not found',
+    type: NotFoundErrorDto,
+  })
+  async confirmEmail(@Param('otp') otp: string) {
+    await this.customerService.activateUser(otp);
+    return;
   }
 
   @Get()
