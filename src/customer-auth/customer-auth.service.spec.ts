@@ -49,6 +49,7 @@ describe('CustomerAuthService', () => {
         password: '6ulYi97qf2RkwoBk',
         email: 'ronswanson@fuckthestate.com',
         name: 'Ron Swanson',
+        isActive: true,
       } as CustomerEntity;
 
       const payloadMock: JwtPayloadDto = {
@@ -78,6 +79,7 @@ describe('CustomerAuthService', () => {
 
       customerMock.login = login;
       customerMock.password = hashSync(password, 8);
+      customerMock.isActive = true;
 
       jest
         .spyOn(customerService, 'findOneByLoginOrEmail')
@@ -129,7 +131,7 @@ describe('CustomerAuthService', () => {
       expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledWith(login);
     });
 
-    it('should return null if method to return customer fails', async () => {
+    it('should return null if finded customer is not active', async () => {
       const login = 'some_login';
       const password = 'cbvaY2CEmXaqQpin';
 
@@ -137,6 +139,30 @@ describe('CustomerAuthService', () => {
 
       customerMock.login = login;
       customerMock.password = hashSync('anotherPass', 8);
+      customerMock.isActive = false;
+
+      jest
+        .spyOn(customerService, 'findOneByLoginOrEmail')
+        .mockResolvedValueOnce(customerMock);
+
+      const result = await customerAuthService.validateCustomer(
+        login,
+        password,
+      );
+
+      expect(result).toStrictEqual(null);
+      expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledTimes(1);
+      expect(customerService.findOneByLoginOrEmail).toHaveBeenCalledWith(login);
+    });
+    it('should return null if password is wrong', async () => {
+      const login = 'some_login';
+      const password = 'cbvaY2CEmXaqQpin';
+
+      const customerMock: CustomerEntity = new CustomerEntity();
+
+      customerMock.login = login;
+      customerMock.password = hashSync('anotherPass', 8);
+      customerMock.isActive = true;
 
       jest
         .spyOn(customerService, 'findOneByLoginOrEmail')

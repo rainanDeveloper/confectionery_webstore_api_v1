@@ -26,7 +26,7 @@ export class CustomerAuthService {
   }
 
   async validateCustomer(login: string, password) {
-    let customer;
+    let customer: CustomerEntity;
 
     try {
       customer = await this.customerService.findOneByLoginOrEmail(login);
@@ -35,6 +35,8 @@ export class CustomerAuthService {
     }
 
     if (!customer) return null;
+
+    if (!customer.isActive) return null;
 
     const passwordIsValid = compareSync(password, customer.password);
 
