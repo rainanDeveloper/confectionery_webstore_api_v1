@@ -32,5 +32,7 @@ export class OrderService {
     }
 
     newOrder.total = findedCart.total;
+
+    await this.cartService.close(cartId);
   }
 }
