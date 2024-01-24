@@ -3,16 +3,25 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderStatus } from '../enum/order-status.enum';
+import { CustomerEntity } from 'src/customer/entities/customer.entity';
 
 @Entity('order')
 export class OrderEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @ManyToOne(() => CustomerEntity)
+  @JoinColumn({
+    name: 'customer_id',
+  })
+  customer: CustomerEntity;
 
   @OneToMany(() => OrderItemEntity, (item) => item.order)
   itens: OrderItemEntity[];
