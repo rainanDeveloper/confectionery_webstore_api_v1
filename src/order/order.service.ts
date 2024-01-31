@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from './entities/order.entity';
 import { Repository } from 'typeorm';
@@ -22,10 +22,15 @@ export class OrderService {
     return createdOrder;
   }
 
-  async createFromCart(cartId: string) {
-    const newOrder = await this.create();
-
+  async createFromCart(cartId: string, customerId?: string) {
     const findedCart = await this.cartService.findOne(cartId, true);
+
+    if (!findedCart.customer && !customerId)
+      throw new BadRequestException(
+        'O pedido precisa de um cliente para ser aberto',
+      );
+
+    const newOrder = await this.create();
 
     if (findedCart.customer) {
       newOrder.customer = findedCart.customer;
