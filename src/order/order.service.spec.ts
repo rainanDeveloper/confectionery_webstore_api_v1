@@ -5,10 +5,16 @@ import { OrderEntity } from './entities/order.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { OrderStatus } from './enum/order-status.enum';
+import { CartService } from 'src/cart/cart.service';
+import { CartEntity } from 'src/cart/entities/cart.entity';
+import { CartStatus } from 'src/cart/enums/cart-status.enum';
+import { CustomerEntity } from 'src/customer/entities/customer.entity';
+import { BadRequestException } from '@nestjs/common';
 
 describe('OrderService', () => {
   let orderService: OrderService;
   let orderRepository: Repository<OrderEntity>;
+  let cartService: CartService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,6 +27,13 @@ describe('OrderService', () => {
             save: jest.fn(),
           },
         },
+        {
+          provide: CartService,
+          useValue: {
+            findOne: jest.fn(),
+            close: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -28,11 +41,13 @@ describe('OrderService', () => {
     orderRepository = module.get<Repository<OrderEntity>>(
       getRepositoryToken(OrderEntity),
     );
+    cartService = module.get<CartService>(CartService);
   });
 
   it('should be defined', () => {
     expect(orderService).toBeDefined();
     expect(orderRepository).toBeDefined();
+    expect(cartService).toBeDefined();
   });
 
   describe('create', () => {
@@ -58,6 +73,117 @@ describe('OrderService', () => {
       });
       expect(orderRepository.save).toHaveBeenCalledTimes(1);
       expect(orderRepository.save).toHaveBeenCalledWith(orderMock);
+    });
+  });
+
+  describe('createFromCart', () => {
+    it('should create a order from a informed cart without customer, but informing customer id', async () => {
+      const customerId = randomUUID();
+      const cartDateMock = new Date('2024-01-12');
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        itens: [],
+        total: 20,
+        status: CartStatus.OPEN,
+        createdAt: cartDateMock,
+        updatedAt: cartDateMock,
+      } as CartEntity;
+
+      const nowMock = new Date();
+      const newOrder: OrderEntity = {
+        id: randomUUID(),
+        itens: [],
+        total: 0,
+        status: OrderStatus.OPEN,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as OrderEntity;
+
+      jest.spyOn(orderService, 'create').mockResolvedValueOnce(newOrder);
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      await orderService.createFromCart(cartMock.id, customerId);
+
+      expect(orderService.create).toHaveBeenCalledTimes(1);
+      expect(orderService.create).toHaveBeenCalledWith();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(cartMock.id, true);
+      expect(cartService.close).toHaveBeenCalledWith(cartMock.id);
+      expect(cartService.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('should create a order from a informed cart with customer', async () => {
+      const customerMock: CustomerEntity = {
+        id: randomUUID(),
+      } as CustomerEntity;
+      const cartDateMock = new Date('2024-01-12');
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        customer: customerMock,
+        itens: [],
+        total: 20,
+        status: CartStatus.OPEN,
+        createdAt: cartDateMock,
+        updatedAt: cartDateMock,
+      } as CartEntity;
+
+      const nowMock = new Date();
+      const newOrder: OrderEntity = {
+        id: randomUUID(),
+        itens: [],
+        total: 0,
+        status: OrderStatus.OPEN,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as OrderEntity;
+
+      jest.spyOn(orderService, 'create').mockResolvedValueOnce(newOrder);
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      await orderService.createFromCart(cartMock.id);
+
+      expect(orderService.create).toHaveBeenCalledTimes(1);
+      expect(orderService.create).toHaveBeenCalledWith();
+      expect(cartService.findOne).toHaveBeenCalledTimes(1);
+      expect(cartService.findOne).toHaveBeenCalledWith(cartMock.id, true);
+      expect(cartService.close).toHaveBeenCalledWith(cartMock.id);
+      expect(cartService.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('should throw a BadRequestException due to no customer is informed whatsoever', async () => {
+      const cartDateMock = new Date('2024-01-12');
+      const cartMock: CartEntity = {
+        id: randomUUID(),
+        itens: [],
+        total: 20,
+        status: CartStatus.OPEN,
+        createdAt: cartDateMock,
+        updatedAt: cartDateMock,
+      } as CartEntity;
+
+      const nowMock = new Date();
+      const newOrder: OrderEntity = {
+        id: randomUUID(),
+        itens: [],
+        total: 0,
+        status: OrderStatus.OPEN,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as OrderEntity;
+
+      jest.spyOn(orderService, 'create').mockResolvedValueOnce(newOrder);
+      jest.spyOn(cartService, 'findOne').mockResolvedValueOnce(cartMock);
+
+      const resultPromise = orderService.createFromCart(cartMock.id);
+
+      expect(resultPromise)
+        .rejects.toThrow(BadRequestException)
+        .then(() => {
+          expect(orderService.create).not.toHaveBeenCalled();
+          expect(cartService.findOne).toHaveBeenCalledTimes(1);
+          expect(cartService.findOne).toHaveBeenCalledWith(cartMock.id, true);
+          expect(cartService.close).not.toHaveBeenCalled();
+        });
     });
   });
 });
