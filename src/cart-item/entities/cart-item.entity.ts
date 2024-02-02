@@ -16,7 +16,8 @@ export class CartItemEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => ProductEntity)
+  @ManyToOne(() => ProductEntity)
+  @JoinColumn({ name: 'product_id' })
   product: ProductEntity;
 
   @ManyToOne(() => CartEntity, (cart) => cart.itens)

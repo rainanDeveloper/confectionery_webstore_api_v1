@@ -36,7 +36,12 @@ export class OrderService {
       newOrder.customer = findedCart.customer;
     }
 
-    newOrder.total = findedCart.total;
+    if (findedCart.itens.length > 0) {
+      newOrder.total = findedCart.total;
+      findedCart.itens.forEach((item) => {});
+    }
+
+    await this.orderRepository.save(newOrder);
 
     await this.cartService.close(cartId);
   }
