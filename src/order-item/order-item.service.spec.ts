@@ -5,10 +5,15 @@ import { OrderItemEntity } from './entities/order-item.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateOrderItemDto } from './dtos/create-order-item.dto';
 import { randomUUID } from 'crypto';
+import { ProductService } from 'src/product/product.service';
+import { OrderService } from 'src/order/order.service';
+import { ProductEntity } from 'src/product/entities/product.entity';
 
 describe('OrderItemService', () => {
   let orderItemService: OrderItemService;
   let orderItemRepository: Repository<OrderItemEntity>;
+  let productService: ProductService;
+  let orderService: OrderService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,6 +26,19 @@ describe('OrderItemService', () => {
             save: jest.fn(),
           },
         },
+        {
+          provide: ProductService,
+          useValue: {
+            findOne: jest.fn(),
+            reserveAmount: jest.fn(),
+          },
+        },
+        {
+          provide: OrderService,
+          useValue: {
+            findOneOpen: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -28,11 +46,15 @@ describe('OrderItemService', () => {
     orderItemRepository = module.get<Repository<OrderItemEntity>>(
       getRepositoryToken(OrderItemEntity),
     );
+    productService = module.get<ProductService>(ProductService);
+    orderService = module.get<OrderService>(OrderService);
   });
 
   it('should be defined', () => {
     expect(orderItemService).toBeDefined();
     expect(orderItemRepository).toBeDefined();
+    expect(productService).toBeDefined();
+    expect(orderService).toBeDefined();
   });
 
   describe('create', () => {
@@ -56,13 +78,25 @@ describe('OrderItemService', () => {
         updatedAt: nowMock,
       } as OrderItemEntity;
 
+      const productEntityMock: ProductEntity = {
+        id: createOrderItemDto.product.id,
+        unitValue: 10,
+      } as ProductEntity;
+
+      jest
+        .spyOn(productService, 'findOne')
+        .mockResolvedValueOnce(productEntityMock);
       jest
         .spyOn(orderItemRepository, 'create')
         .mockReturnValueOnce(orderItemMock);
 
-      const item = await orderItemService.create(createOrderItemDto);
+      const item = await orderItemService.create(createOrderItemDto, true);
 
-      expect(item).toStrictEqual(orderItemMock);
+      expect(item).toStrictEqual({
+        ...orderItemMock,
+        unitValue: 10,
+        total: 20,
+      });
       expect(orderItemRepository.create).toHaveBeenCalledTimes(1);
       expect(orderItemRepository.save).toHaveBeenCalledTimes(1);
     });
