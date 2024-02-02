@@ -3,6 +3,8 @@ import { OrderItemService } from './order-item.service';
 import { Repository } from 'typeorm';
 import { OrderItemEntity } from './entities/order-item.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { CreateOrderItemDto } from './dtos/create-order-item.dto';
+import { randomUUID } from 'crypto';
 
 describe('OrderItemService', () => {
   let orderItemService: OrderItemService;
@@ -34,10 +36,35 @@ describe('OrderItemService', () => {
   });
 
   describe('create', () => {
-    it('', async () => {
-      // Arrange
-      // Act
-      // Assert
+    it('should create a order item', async () => {
+      const nowMock = new Date();
+      const createOrderItemDto: CreateOrderItemDto = {
+        product: {
+          id: randomUUID(),
+        },
+        order: {
+          id: randomUUID(),
+        },
+        quantity: 2,
+      };
+
+      const orderItemMock: OrderItemEntity = {
+        product: createOrderItemDto.product,
+        order: createOrderItemDto.order,
+        quantity: 2,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      } as OrderItemEntity;
+
+      jest
+        .spyOn(orderItemRepository, 'create')
+        .mockReturnValueOnce(orderItemMock);
+
+      const item = await orderItemService.create(createOrderItemDto);
+
+      expect(item).toStrictEqual(orderItemMock);
+      expect(orderItemRepository.create).toHaveBeenCalledTimes(1);
+      expect(orderItemRepository.save).toHaveBeenCalledTimes(1);
     });
   });
 });
