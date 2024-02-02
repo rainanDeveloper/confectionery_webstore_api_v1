@@ -1,8 +1,10 @@
 import { OrderEntity } from 'src/order/entities/order.entity';
+import { ProductEntity } from 'src/product/entities/product.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -13,7 +15,12 @@ export class OrderItemEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ManyToOne(() => ProductEntity)
+  @JoinColumn({ name: 'product_id' })
+  product: ProductEntity;
+
   @ManyToOne(() => OrderEntity, (order) => order.itens)
+  @JoinColumn({ name: 'cart_id' })
   order: OrderEntity;
 
   @Column({
@@ -26,13 +33,13 @@ export class OrderItemEntity {
   unitValue: number;
 
   @Column({
-    name: 'amount',
+    name: 'quantity',
     type: 'decimal',
     precision: 4,
     nullable: false,
     default: 0,
   })
-  amount: number;
+  quantity: number;
 
   @Column({
     name: 'total',
