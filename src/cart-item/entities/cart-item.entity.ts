@@ -17,6 +17,7 @@ export class CartItemEntity {
   id: string;
 
   @ManyToOne(() => ProductEntity)
+  @JoinColumn({ name: 'product_id' })
   product: ProductEntity;
 
   @ManyToOne(() => CartEntity, (cart) => cart.itens)
