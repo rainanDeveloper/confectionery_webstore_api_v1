@@ -8,6 +8,7 @@ import { randomUUID } from 'crypto';
 import { ProductService } from 'src/product/product.service';
 import { OrderService } from 'src/order/order.service';
 import { ProductEntity } from 'src/product/entities/product.entity';
+import { OrderEntity } from 'src/order/entities/order.entity';
 
 describe('OrderItemService', () => {
   let orderItemService: OrderItemService;
@@ -83,14 +84,21 @@ describe('OrderItemService', () => {
         unitValue: 10,
       } as ProductEntity;
 
+      const orderEntityMock: OrderEntity = {
+        id: createOrderItemDto.order.id,
+      } as OrderEntity;
+
       jest
         .spyOn(productService, 'findOne')
         .mockResolvedValueOnce(productEntityMock);
       jest
+        .spyOn(orderService, 'findOneOpen')
+        .mockResolvedValueOnce(orderEntityMock);
+      jest
         .spyOn(orderItemRepository, 'create')
         .mockReturnValueOnce(orderItemMock);
 
-      const item = await orderItemService.create(createOrderItemDto, true);
+      const item = await orderItemService.create(createOrderItemDto);
 
       expect(item).toStrictEqual({
         ...orderItemMock,
@@ -98,7 +106,28 @@ describe('OrderItemService', () => {
         total: 20,
       });
       expect(orderItemRepository.create).toHaveBeenCalledTimes(1);
+      expect(orderItemRepository.create).toHaveBeenCalledWith(
+        createOrderItemDto,
+      );
+      expect(productService.findOne).toHaveBeenCalledTimes(1);
+      expect(productService.findOne).toHaveBeenCalledWith(
+        createOrderItemDto.product.id,
+      );
+      expect(orderService.findOneOpen).toHaveBeenCalledTimes(1);
+      expect(orderService.findOneOpen).toHaveBeenCalledWith(
+        createOrderItemDto.order.id,
+      );
+      expect(productService.reserveAmount).toHaveBeenCalledTimes(1);
+      expect(productService.reserveAmount).toHaveBeenCalledWith(
+        createOrderItemDto.product.id,
+        createOrderItemDto.quantity,
+      );
       expect(orderItemRepository.save).toHaveBeenCalledTimes(1);
+      expect(orderItemRepository.save).toHaveBeenCalledWith({
+        ...orderItemMock,
+        unitValue: 10,
+        total: 20,
+      });
     });
   });
 });
