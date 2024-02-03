@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { AuthCustomerStrategy } from './auth-customer.strategy';
 import { CustomerAuthService } from '../customer-auth.service';
+import { CustomerEntity } from 'src/customer/entities/customer.entity';
 
 describe('LocalCustomerStrategy', () => {
   let localCustomerStrategy: AuthCustomerStrategy;
@@ -34,12 +35,12 @@ describe('LocalCustomerStrategy', () => {
 
   describe('validate', () => {
     it('should validate a user sucessfully', async () => {
-      const mockUser: UserEntity = {
+      const mockUser: CustomerEntity = {
         id: randomUUID(),
         login: 'some_login',
         email: 'some@login.mail',
         password: '3mTOOe9p3t',
-      } as UserEntity;
+      } as CustomerEntity;
 
       jest
         .spyOn(customerAuthService, 'validateCustomer')
