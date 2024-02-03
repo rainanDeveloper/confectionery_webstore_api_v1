@@ -9,6 +9,7 @@ import { ProductService } from 'src/product/product.service';
 import { OrderService } from 'src/order/order.service';
 import { ProductEntity } from 'src/product/entities/product.entity';
 import { OrderEntity } from 'src/order/entities/order.entity';
+import { NotFoundException } from '@nestjs/common';
 
 describe('OrderItemService', () => {
   let orderItemService: OrderItemService;
@@ -128,6 +129,42 @@ describe('OrderItemService', () => {
         unitValue: 10,
         total: 20,
       });
+    });
+
+    it('should throw a error', async () => {
+      const createOrderItemDto: CreateOrderItemDto = {
+        product: {
+          id: randomUUID(),
+        },
+        order: {
+          id: randomUUID(),
+        },
+        quantity: 2,
+      };
+
+      const productEntityMock: ProductEntity = {
+        id: createOrderItemDto.product.id,
+        unitValue: 10,
+      } as ProductEntity;
+
+      jest
+        .spyOn(productService, 'findOne')
+        .mockResolvedValueOnce(productEntityMock);
+
+      const resultPromise = orderItemService.create(createOrderItemDto);
+
+      expect(resultPromise)
+        .rejects.toThrow(NotFoundException)
+        .then(() => {
+          expect(orderItemRepository.create).not.toHaveBeenCalled();
+          expect(productService.findOne).not.toHaveBeenCalled();
+          expect(orderService.findOneOpen).toHaveBeenCalledTimes(1);
+          expect(orderService.findOneOpen).toHaveBeenCalledWith(
+            createOrderItemDto.order.id,
+          );
+          expect(productService.reserveAmount).not.toHaveBeenCalled();
+          expect(orderItemRepository.save).not.toHaveBeenCalled();
+        });
     });
   });
 });
