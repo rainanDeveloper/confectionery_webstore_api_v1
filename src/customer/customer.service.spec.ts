@@ -35,6 +35,7 @@ describe('CustomerService', () => {
           provide: CustomerOtpService,
           useValue: {
             findOne: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
@@ -87,7 +88,7 @@ describe('CustomerService', () => {
         .spyOn(customerRepository, 'create')
         .mockReturnValueOnce(customerMock);
 
-      const result = await customerService.create(customerDto);
+      const result = await customerService.create(customerDto, ['pt-BR']);
 
       expect(result).toEqual(customerMock.id);
       expect(customerRepository.create).toHaveBeenCalledWith(customerDto);
@@ -97,10 +98,13 @@ describe('CustomerService', () => {
       expect(mailService.sendCustomerConfirmationEmail).toHaveBeenCalledTimes(
         1,
       );
-      expect(mailService.sendCustomerConfirmationEmail).toHaveBeenCalledWith({
-        login: customerDto.login,
-        email: customerDto.email,
-      });
+      expect(mailService.sendCustomerConfirmationEmail).toHaveBeenCalledWith(
+        {
+          login: customerDto.login,
+          email: customerDto.email,
+        },
+        ['pt-BR'],
+      );
     });
   });
 
