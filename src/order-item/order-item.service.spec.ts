@@ -131,7 +131,7 @@ describe('OrderItemService', () => {
       });
     });
 
-    it('should throw a error', async () => {
+    it('should throw a NotFoundException error', async () => {
       const createOrderItemDto: CreateOrderItemDto = {
         product: {
           id: randomUUID(),
