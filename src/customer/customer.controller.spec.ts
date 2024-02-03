@@ -67,7 +67,9 @@ describe('CustomerController', () => {
       const headerMock = jest.fn().mockReturnValue({ status: statusMock });
 
       const requestMock = {
-        headers: {},
+        headers: {
+          'accept-language': 'pt-BR',
+        },
       } as any;
 
       const responseMock = {
@@ -88,7 +90,9 @@ describe('CustomerController', () => {
 
       expect(result).toBeUndefined();
       expect(customerService.create).toHaveBeenCalledTimes(1);
-      expect(customerService.create).toHaveBeenCalledWith(customerDto);
+      expect(customerService.create).toHaveBeenCalledWith(customerDto, [
+        'pt-BR',
+      ]);
       expect(headerMock).toHaveBeenCalledTimes(1);
       expect(headerMock).toHaveBeenCalledWith(
         'location',

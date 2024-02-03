@@ -3,7 +3,6 @@ import { MailService } from './mail.service';
 import { ConfigService } from '@nestjs/config';
 import { CustomerConfirmationDto } from './dtos/customer-confirmation.dto';
 import { CustomerOtpService } from 'src/customer/customer-otp.service';
-import { randomUUID } from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 
 describe('MailService', () => {
@@ -72,6 +71,7 @@ describe('MailService', () => {
         to: customerConfirmationDto.email,
         subject: 'Confirm your email',
         template: 'customer-email-confirmation',
+        from: expect.any(String),
         context: {
           customer: customerConfirmationDto,
           otp_url: expect.any(String),

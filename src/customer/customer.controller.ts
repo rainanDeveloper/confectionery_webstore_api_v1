@@ -51,8 +51,7 @@ export class CustomerController {
     @Res() response: Response,
   ) {
     const langs = request.headers['accept-language']?.split(';')[0]?.split(',');
-    let customerId;
-    customerId = await this.customerService.create(customerDto, langs);
+    const customerId = await this.customerService.create(customerDto, langs);
 
     const getUrl = `customer/${customerId}`;
 

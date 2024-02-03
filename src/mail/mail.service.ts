@@ -25,7 +25,7 @@ export class MailService {
       email: customerConfirmationDto.email,
     });
 
-    const otp_url = `${this.configService.getOrThrow(
+    const otp_url = `${await this.configService.getOrThrow(
       'APPLICATION_HOST',
     )}/api/confirmEmail/${otp}`;
 
@@ -38,7 +38,7 @@ export class MailService {
 
     this.mailerService.sendMail({
       to: customerConfirmationDto.email,
-      from: this.configService.getOrThrow('SMTP_EMAIL'),
+      from: await this.configService.getOrThrow('SMTP_EMAIL'),
       subject,
       template,
       context: {
