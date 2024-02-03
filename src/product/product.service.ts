@@ -73,6 +73,15 @@ export class ProductService {
     });
   }
 
+  async reserveAmount(id: string, amount: number) {
+    const findedProduct = await this.findOne(id);
+
+    findedProduct.stockReservedAmount += amount;
+    findedProduct.stockAmount -= amount;
+
+    await this.productRepository.save(findedProduct);
+  }
+
   async update(productId: string, productDto: UpdateProductDto) {
     const existent = await this.productRepository.findOneBy({
       id: productId,

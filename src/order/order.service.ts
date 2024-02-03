@@ -45,4 +45,13 @@ export class OrderService {
 
     await this.cartService.close(cartId);
   }
+
+  async findOneOpen(id: string) {
+    return await this.orderRepository.findOne({
+      where: {
+        id,
+        status: OrderStatus.OPEN,
+      },
+    });
+  }
 }
