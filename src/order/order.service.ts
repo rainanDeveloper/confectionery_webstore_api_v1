@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from './entities/order.entity';
 import { Repository } from 'typeorm';
@@ -14,7 +19,7 @@ export class OrderService {
     private readonly orderRepository: Repository<OrderEntity>,
     @Inject(CartService)
     private readonly cartService: CartService,
-    @Inject(OrderItemService)
+    @Inject(forwardRef(() => OrderItemService))
     private readonly orderItemService: OrderItemService,
   ) {}
 
