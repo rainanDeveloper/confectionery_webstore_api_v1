@@ -10,11 +10,13 @@ import { CartEntity } from 'src/cart/entities/cart.entity';
 import { CartStatus } from 'src/cart/enums/cart-status.enum';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import { BadRequestException } from '@nestjs/common';
+import { OrderItemService } from 'src/order-item/order-item.service';
 
 describe('OrderService', () => {
   let orderService: OrderService;
   let orderRepository: Repository<OrderEntity>;
   let cartService: CartService;
+  let orderItemService: OrderItemService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,6 +36,12 @@ describe('OrderService', () => {
             close: jest.fn(),
           },
         },
+        {
+          provide: OrderItemService,
+          useValue: {
+            create: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -42,12 +50,14 @@ describe('OrderService', () => {
       getRepositoryToken(OrderEntity),
     );
     cartService = module.get<CartService>(CartService);
+    orderItemService = module.get<OrderItemService>(OrderItemService);
   });
 
   it('should be defined', () => {
     expect(orderService).toBeDefined();
     expect(orderRepository).toBeDefined();
     expect(cartService).toBeDefined();
+    expect(orderItemService).toBeDefined();
   });
 
   describe('create', () => {
@@ -73,6 +83,7 @@ describe('OrderService', () => {
       });
       expect(orderRepository.save).toHaveBeenCalledTimes(1);
       expect(orderRepository.save).toHaveBeenCalledWith(orderMock);
+      expect(orderItemService.create).not.toHaveBeenCalled();
     });
   });
 
@@ -110,6 +121,7 @@ describe('OrderService', () => {
       expect(cartService.findOne).toHaveBeenCalledWith(cartMock.id, true);
       expect(cartService.close).toHaveBeenCalledWith(cartMock.id);
       expect(cartService.close).toHaveBeenCalledTimes(1);
+      expect(orderItemService.create).not.toHaveBeenCalled();
     });
 
     it('should create a order from a informed cart with customer', async () => {
@@ -148,6 +160,7 @@ describe('OrderService', () => {
       expect(cartService.findOne).toHaveBeenCalledWith(cartMock.id, true);
       expect(cartService.close).toHaveBeenCalledWith(cartMock.id);
       expect(cartService.close).toHaveBeenCalledTimes(1);
+      expect(orderItemService.create).not.toHaveBeenCalled();
     });
 
     it('should throw a BadRequestException due to no customer is informed whatsoever', async () => {
@@ -183,6 +196,7 @@ describe('OrderService', () => {
           expect(cartService.findOne).toHaveBeenCalledTimes(1);
           expect(cartService.findOne).toHaveBeenCalledWith(cartMock.id, true);
           expect(cartService.close).not.toHaveBeenCalled();
+          expect(orderItemService.create).not.toHaveBeenCalled();
         });
     });
   });
