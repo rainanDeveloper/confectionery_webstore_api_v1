@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres-confectionery-webstore:
+    container_name: 'postgres-confectionery-webstore'
+    image: postgres:16
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/postgresql/data:/var/lib/postgresql/data
+
