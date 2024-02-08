@@ -27,7 +27,7 @@ import { MailModule } from './mail/mail.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
+        type: 'postgres',
         host: configService.getOrThrow('DB_HOST'),
         port: configService.getOrThrow('DB_PORT'),
         username: configService.getOrThrow('DB_USERNAME'),

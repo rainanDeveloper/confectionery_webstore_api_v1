@@ -44,3 +44,7 @@ lerna-debug.log*
 # Docker files
 
 docker/mysql
+
+# Temporary database
+
+db.sqlite

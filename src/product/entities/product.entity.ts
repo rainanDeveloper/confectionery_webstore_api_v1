@@ -1,4 +1,5 @@
 import { CategoryEntity } from 'src/category/entities/category.entity';
+import { ColumnNumericTransformer } from 'src/utils/column-numeric-transformer.class';
 import {
   BeforeInsert,
   Column,
@@ -24,36 +25,44 @@ export class ProductEntity {
   @Column({
     name: 'cost',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
     nullable: false,
     default: 0,
+    transformer: new ColumnNumericTransformer(),
   })
   cost: number;
 
   @Column({
     name: 'profit_percent',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
     nullable: false,
     default: 0,
+    transformer: new ColumnNumericTransformer(),
   })
   profitPercent: number;
 
   @Column({
     name: 'profit',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
     nullable: false,
     default: 0,
+    transformer: new ColumnNumericTransformer(),
   })
   profit: number;
 
   @Column({
     name: 'unit_value',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
     nullable: false,
     default: 0,
+    transformer: new ColumnNumericTransformer(),
   })
   unitValue: number;
 
@@ -66,18 +75,22 @@ export class ProductEntity {
   @Column({
     name: 'stock_amount',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
     nullable: false,
     default: 0,
+    transformer: new ColumnNumericTransformer(),
   })
   stockAmount: number;
 
   @Column({
     name: 'stock_reserved_amount',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
     nullable: false,
     default: 0,
+    transformer: new ColumnNumericTransformer(),
   })
   stockReservedAmount: number;
 
