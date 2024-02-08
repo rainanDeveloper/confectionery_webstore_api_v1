@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { OrderStatus } from '../enum/order-status.enum';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
+import { ColumnNumericTransformer } from 'src/utils/column-numeric-transformer.class';
 
 @Entity('order')
 export class OrderEntity {
@@ -29,7 +30,9 @@ export class OrderEntity {
   @Column({
     name: 'total',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
+    transformer: new ColumnNumericTransformer(),
     nullable: false,
     default: 0,
   })

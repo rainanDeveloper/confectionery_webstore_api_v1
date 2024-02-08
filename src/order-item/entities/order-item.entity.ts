@@ -1,5 +1,6 @@
 import { OrderEntity } from 'src/order/entities/order.entity';
 import { ProductEntity } from 'src/product/entities/product.entity';
+import { ColumnNumericTransformer } from 'src/utils/column-numeric-transformer.class';
 import {
   Column,
   CreateDateColumn,
@@ -26,7 +27,9 @@ export class OrderItemEntity {
   @Column({
     name: 'unit_value',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
+    transformer: new ColumnNumericTransformer(),
     nullable: false,
     default: 0,
   })
@@ -35,7 +38,9 @@ export class OrderItemEntity {
   @Column({
     name: 'quantity',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
+    transformer: new ColumnNumericTransformer(),
     nullable: false,
     default: 0,
   })
@@ -44,7 +49,9 @@ export class OrderItemEntity {
   @Column({
     name: 'total',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
+    transformer: new ColumnNumericTransformer(),
     nullable: false,
     default: 0,
   })

@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { CartStatus } from '../enums/cart-status.enum';
 import { CartItemEntity } from 'src/cart-item/entities/cart-item.entity';
+import { ColumnNumericTransformer } from 'src/utils/column-numeric-transformer.class';
 
 @Entity('cart')
 export class CartEntity {
@@ -29,7 +30,9 @@ export class CartEntity {
   @Column({
     name: 'total',
     type: 'decimal',
-    precision: 4,
+    precision: 10,
+    scale: 4,
+    transformer: new ColumnNumericTransformer(),
     nullable: false,
     default: 0,
   })
