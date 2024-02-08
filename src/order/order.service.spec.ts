@@ -27,6 +27,7 @@ describe('OrderService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            findOne: jest.fn(),
           },
         },
         {
@@ -242,6 +243,27 @@ describe('OrderService', () => {
       expect(cartService.close).toHaveBeenCalledWith(cartMock.id);
       expect(cartService.close).toHaveBeenCalledTimes(1);
       expect(orderItemService.create).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('findOneOpen', () => {
+    it('should find a cart successfully', async () => {
+      const id = randomUUID();
+      const nowMock = new Date();
+      const orderMock: OrderEntity = {
+        id,
+        customer: {} as CustomerEntity,
+        itens: [],
+        total: 0,
+        status: OrderStatus.OPEN,
+        createdAt: nowMock,
+        updatedAt: nowMock,
+      };
+
+      jest.spyOn(orderRepository, 'findOne').mockResolvedValueOnce(orderMock);
+      const findedOrder = await orderService.findOneOpen(id);
+
+      expect(findedOrder).toBeDefined();
     });
   });
 });
