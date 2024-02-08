@@ -3,14 +3,19 @@ import {
   Inject,
   Param,
   Post,
-  Query,
   Req,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Request } from 'express';
+import { OptionalJwtCustomerGuard } from 'src/customer-auth/guards/optional-jwt-customer.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('order')
+@ApiTags('Order')
+@UseGuards(OptionalJwtCustomerGuard)
+@ApiBearerAuth()
 export class OrderController {
   constructor(
     @Inject(OrderService) private readonly orderService: OrderService,
