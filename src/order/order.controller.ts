@@ -8,7 +8,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { OrderEntity } from './entities/order.entity';
 import { Request } from 'express';
 
 @Controller('order')
