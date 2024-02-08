@@ -1,9 +1,9 @@
-version: '3.1'
+version: '3.8'
 
 services:
   mysql-confectionery-webstore:
     container_name: 'mysql-confectionery-webstore'
-    image: mysql
+    image: mysql:8.0
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=admin
@@ -14,4 +14,5 @@ services:
       - 3306:3306
     volumes:
       - ./mysql/data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 

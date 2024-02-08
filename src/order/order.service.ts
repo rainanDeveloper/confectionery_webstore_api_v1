@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  UnauthorizedException,
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -31,7 +32,10 @@ export class OrderService {
     return createdOrder;
   }
 
-  async createFromCart(cartId: string, customerId?: string) {
+  async createFromCart(
+    cartId: string,
+    customerId: string,
+  ): Promise<OrderEntity> {
     const findedCart = await this.cartService.findOne(cartId, true);
 
     if (!findedCart.customer && !customerId)
@@ -41,9 +45,7 @@ export class OrderService {
 
     const newOrder = await this.create();
 
-    if (findedCart.customer) {
-      newOrder.customer = findedCart.customer;
-    }
+    newOrder.customer.id = customerId;
 
     if (findedCart.itens.length > 0) {
       newOrder.total = findedCart.total;
@@ -66,6 +68,8 @@ export class OrderService {
     await this.orderRepository.save(newOrder);
 
     await this.cartService.close(cartId);
+
+    return newOrder;
   }
 
   async findOneOpen(id: string) {
