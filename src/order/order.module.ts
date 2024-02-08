@@ -14,5 +14,6 @@ import { OrderItemModule } from 'src/order-item/order-item.module';
     forwardRef(() => OrderItemModule),
   ],
   providers: [OrderService],
+  exports: [OrderService],
 })
 export class OrderModule {}
