@@ -94,7 +94,7 @@ export class CartService {
       },
     };
     if (includeItens) {
-      findOneOptions.relations = ['itens'];
+      findOneOptions.relations = ['itens', 'itens.product'];
     }
 
     return await this.cartRepository.findOne(findOneOptions);

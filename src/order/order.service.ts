@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
   forwardRef,
 } from '@nestjs/common';
@@ -12,6 +13,8 @@ import { OrderStatus } from './enum/order-status.enum';
 import { CartService } from 'src/cart/cart.service';
 import { OrderItemService } from 'src/order-item/order-item.service';
 import { CreateOrderItemDto } from 'src/order-item/dtos/create-order-item.dto';
+import { CustomerEntity } from 'src/customer/entities/customer.entity';
+import { OrderItemEntity } from 'src/order-item/entities/order-item.entity';
 
 @Injectable()
 export class OrderService {
@@ -38,6 +41,10 @@ export class OrderService {
   ): Promise<OrderEntity> {
     const findedCart = await this.cartService.findOne(cartId, true);
 
+    if (!findedCart) {
+      throw new NotFoundException(`Carrinho ${cartId} não encontrado!`);
+    }
+
     if (!findedCart.customer && !customerId)
       throw new BadRequestException(
         'O pedido precisa de um cliente para ser aberto',
@@ -45,10 +52,13 @@ export class OrderService {
 
     const newOrder = await this.create();
 
-    newOrder.customer.id = customerId;
+    newOrder.customer = {
+      id: customerId,
+    } as CustomerEntity;
 
     if (findedCart.itens.length > 0) {
       newOrder.total = findedCart.total;
+      let itensArray: OrderItemEntity[];
       const itensPromiseArray = findedCart.itens.map(async (item) => {
         const itemDto: CreateOrderItemDto = {
           product: {
@@ -59,7 +69,19 @@ export class OrderService {
           },
           quantity: item.quantity,
         };
-        return this.orderItemService.create(itemDto);
+        try {
+          const created = await this.orderItemService.create(itemDto);
+          itensArray.push(created);
+        } catch (error) {
+          await Promise.all(
+            itensArray.map(async (item) => {
+              await this.orderItemService.delete(item.id);
+            }),
+          );
+          await this.orderRepository.delete({
+            id: newOrder.id,
+          });
+        }
       });
 
       Promise.all(itensPromiseArray);
