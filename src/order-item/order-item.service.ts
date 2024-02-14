@@ -64,6 +64,8 @@ export class OrderItemService {
     return item;
   }
   async delete(id: string) {
-    throw new Error('Method not implemented.');
+    await this.orderItemRepository.delete({
+      id,
+    });
   }
 }
