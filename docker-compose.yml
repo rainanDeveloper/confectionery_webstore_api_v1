@@ -15,4 +15,10 @@ services:
       - "5432:5432"
     volumes:
       - ./docker/postgresql/data:/var/lib/postgresql/data
+  confectionery-webstore-app-01:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file: .env
+    command: npm run start:prod
 
