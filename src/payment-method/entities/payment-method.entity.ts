@@ -21,7 +21,7 @@ export class PaymentMethodEntity {
     type: 'varchar',
     nullable: true,
   })
-  applicationKey: string;
+  applicationKey?: string;
 
   @Column({
     name: 'optional_data_1',
