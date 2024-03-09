@@ -14,7 +14,7 @@ export class PaymentMethodEntity {
     default: false,
     nullable: false,
   })
-  status: boolean;
+  status?: boolean;
 
   @Column({
     name: 'application_key',

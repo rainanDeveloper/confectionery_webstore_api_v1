@@ -15,6 +15,18 @@ export class SeederService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     const startTime = performance.now();
 
+    const endTime = performance.now();
+
+    await this.seedUsers();
+
+    await this.seedPaymentMethods();
+
+    const elapsed = Number.parseInt((endTime - startTime).toString());
+
+    this.logger.log(`Database seed done +${elapsed}ms`);
+  }
+
+  private async seedUsers() {
     const users = await this.userService.findAll();
 
     if (users.length < 1) {
@@ -27,11 +39,7 @@ export class SeederService implements OnApplicationBootstrap {
 
       await this.userService.create(userDto);
     }
-
-    const endTime = performance.now();
-
-    const elapsed = Number.parseInt((endTime - startTime).toString());
-
-    this.logger.log(`Database seed done +${elapsed}ms`);
   }
+
+  private async seedPaymentMethods() {}
 }
