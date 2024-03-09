@@ -58,7 +58,7 @@ export class OrderService {
 
     if (findedCart.itens.length > 0) {
       newOrder.total = findedCart.total;
-      let itensArray: OrderItemEntity[];
+      let itensArray: OrderItemEntity[] = []
       const itensPromiseArray = findedCart.itens.map(async (item) => {
         const itemDto: CreateOrderItemDto = {
           product: {
