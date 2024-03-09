@@ -526,7 +526,7 @@ describe('CartService', () => {
           id: cartId,
           status: CartStatus.OPEN,
         },
-        relations: ['itens'],
+        relations: ['itens', 'itens.product'],
       });
     });
 
