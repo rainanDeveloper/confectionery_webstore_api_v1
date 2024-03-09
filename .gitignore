@@ -43,7 +43,7 @@ lerna-debug.log*
 
 # Docker files
 
-docker/mysql
+docker/postgresql
 
 # Temporary database
 

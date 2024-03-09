@@ -19,6 +19,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CartCronJobsService } from './cart-cron-jobs/cart-cron-jobs.service';
 import { CartCronJobsModule } from './cart-cron-jobs/cart-cron-jobs.module';
 import { MailModule } from './mail/mail.module';
+import { PaymentMethodModule } from './payment-method/payment-method.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { MailModule } from './mail/mail.module';
     CartItemModule,
     CartCronJobsModule,
     MailModule,
+    PaymentMethodModule,
   ],
   controllers: [AppController],
   providers: [AppService, CartCronJobsService],
