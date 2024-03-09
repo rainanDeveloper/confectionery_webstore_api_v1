@@ -11,12 +11,18 @@ export class PaymentMethodService {
     private readonly paymentMethodRepository: Repository<PaymentMethodEntity>,
   ) {}
 
-  async create(createPaymentMethodDto: CreatePaymentMethodDto) {
+  async create(
+    createPaymentMethodDto: CreatePaymentMethodDto,
+  ): Promise<string> {
     const paymentMethod = this.paymentMethodRepository.create(
       createPaymentMethodDto,
     );
 
     await this.paymentMethodRepository.save(paymentMethod);
     return paymentMethod.id;
+  }
+
+  async findAll(): Promise<PaymentMethodEntity[]> {
+    return await this.paymentMethodRepository.find();
   }
 }

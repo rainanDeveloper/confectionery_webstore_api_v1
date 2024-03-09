@@ -19,6 +19,7 @@ describe('PaymentMethodService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            find: jest.fn(),
           },
         },
       ],
@@ -64,6 +65,33 @@ describe('PaymentMethodService', () => {
       expect(paymentMethodRepository.save).toHaveBeenCalledWith(
         paymentMethodMock,
       );
+    });
+  });
+
+  describe('findAll', () => {
+    it('should find all payment methods', async () => {
+      // Arrange
+      const paymentMethodsMock: PaymentMethodEntity[] = [
+        {
+          id: randomUUID(),
+          name: 'BITCOIN',
+          status: true,
+        },
+        {
+          id: randomUUID(),
+          name: 'PAYPAL',
+          status: false,
+        },
+      ];
+      jest
+        .spyOn(paymentMethodRepository, 'find')
+        .mockResolvedValueOnce(paymentMethodsMock);
+      // Act
+      const result = await paymentMethodService.findAll();
+      // Assert
+      expect(result).toStrictEqual(paymentMethodsMock);
+      expect(paymentMethodRepository.find).toHaveBeenCalledTimes(1);
+      expect(paymentMethodRepository.find).toHaveBeenCalledWith();
     });
   });
 });
