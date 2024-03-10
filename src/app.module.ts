@@ -20,6 +20,7 @@ import { CartCronJobsService } from './cart-cron-jobs/cart-cron-jobs.service';
 import { CartCronJobsModule } from './cart-cron-jobs/cart-cron-jobs.module';
 import { MailModule } from './mail/mail.module';
 import { PaymentMethodModule } from './payment-method/payment-method.module';
+import { ExternalModule } from './external/external.module';
 
 @Module({
   imports: [
