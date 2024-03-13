@@ -38,7 +38,7 @@ export class CartService {
 
       if (existentOpenCartForUser)
         throw new ConflictException(
-          `There is an open cart for the informed customer already`,
+          `O cliente informado já possui um carinho em aberto`,
         );
 
       newCartDto.customer = createCartDto.customer;
@@ -49,7 +49,7 @@ export class CartService {
       await this.cartRepository.save(newCart);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: `Error during the cart creation`,
+        message: `Erro durante a criação do carrinho`,
         error,
       });
     }
@@ -78,7 +78,7 @@ export class CartService {
       await this.cartRepository.save(newCart);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: `Error during the cart update of totals`,
+        message: `Erro durante a atualização do total do carrinho`,
         error,
       });
     }
