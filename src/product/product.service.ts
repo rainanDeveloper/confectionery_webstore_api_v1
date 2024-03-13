@@ -88,7 +88,7 @@ export class ProductService {
     });
 
     if (!existent) {
-      throw new NotFoundException(`Product ${productId} not found!`);
+      throw new NotFoundException(`Produto ${productId} não encontrado`);
     }
 
     existent.title = productDto.title;

@@ -45,7 +45,7 @@ export class UserService {
         ],
       });
     } catch (error) {
-      throw new NotFoundException(`User not found`);
+      throw new NotFoundException(`Usuário não encontrado`);
     }
   }
   async findOneById(id: string): Promise<UserEntity> {
@@ -55,7 +55,7 @@ export class UserService {
         select: ['id', 'email', 'login', 'isActive', 'createdAt', 'updatedAt'],
       });
     } catch (error) {
-      throw new NotFoundException(`User not found`);
+      throw new NotFoundException(`Usuário não encontrado`);
     }
   }
   async updateOne(id: string, updateUserDto: UpdateUserDto): Promise<void> {
