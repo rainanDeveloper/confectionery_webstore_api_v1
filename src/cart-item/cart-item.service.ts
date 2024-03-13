@@ -31,7 +31,7 @@ export class CartItemService {
 
     if (!existentCart) {
       throw new NotFoundException(
-        `Cart ${createCartItemDto.cart.id} not found`,
+        `Carrinho ${createCartItemDto.cart.id} não encontrado`,
       );
     }
 
@@ -41,7 +41,7 @@ export class CartItemService {
 
     if (!existentProduct)
       throw new NotFoundException(
-        `Product ${createCartItemDto.product.id} not found`,
+        `Produto ${createCartItemDto.product.id} não encontrado`,
       );
 
     if (
@@ -49,7 +49,7 @@ export class CartItemService {
       createCartItemDto.quantity
     )
       throw new BadRequestException(
-        `Product ${createCartItemDto.product.id} has not enough itens in stock to add this much (${createCartItemDto.quantity}) to a cart`,
+        `Produto ${createCartItemDto.product.id} não possui estoque suficiente para adicionar ${createCartItemDto.quantity} itens ao carrinho`,
       );
 
     const newCartItemDto: NewCartItemDto = {

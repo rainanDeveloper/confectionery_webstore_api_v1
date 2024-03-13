@@ -41,7 +41,9 @@ export class CustomerService {
     const otpRecord = await this.customerOtpService.findOne(otp);
 
     if (!otpRecord) {
-      throw new NotFoundException(`Customer with informed otp not found!`);
+      throw new NotFoundException(
+        `O cliente com o otp informado não foi encontrado`,
+      );
     }
 
     const { email } = otpRecord;
@@ -49,7 +51,9 @@ export class CustomerService {
     const customer = await this.findOneByLoginOrEmail(email);
 
     if (!customer) {
-      throw new NotFoundException(`Customer with informed otp not found!`);
+      throw new NotFoundException(
+        `O cliente com o otp informado não foi encontrado`,
+      );
     }
 
     customer.isActive = true;
@@ -75,7 +79,7 @@ export class CustomerService {
     });
 
     if (!finded) {
-      throw new NotFoundException(`Customer ${id} was not found`);
+      throw new NotFoundException(`Cliente ${id} não foi encontrado`);
     }
 
     return finded;

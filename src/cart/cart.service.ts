@@ -38,7 +38,7 @@ export class CartService {
 
       if (existentOpenCartForUser)
         throw new ConflictException(
-          `There is an open cart for the informed customer already`,
+          `O cliente informado já possui um carinho em aberto`,
         );
 
       newCartDto.customer = createCartDto.customer;
@@ -49,7 +49,7 @@ export class CartService {
       await this.cartRepository.save(newCart);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: `Error during the cart creation`,
+        message: `Erro durante a criação do carrinho`,
         error,
       });
     }
@@ -78,7 +78,7 @@ export class CartService {
       await this.cartRepository.save(newCart);
     } catch (error) {
       throw new InternalServerErrorException({
-        message: `Error during the cart update of totals`,
+        message: `Erro durante a atualização do total do carrinho`,
         error,
       });
     }
@@ -156,16 +156,16 @@ export class CartService {
     const existentCart = await this.findOne(id, true);
 
     if (existentCart.status !== CartStatus.OPEN)
-      throw new ConflictException(`Cart ${id} is already closed`);
+      throw new ConflictException(`Carrinho ${id} já encontra-se fechado`);
 
     if (existentCart.total <= 0)
       throw new UnprocessableEntityException(
-        `The cart ${id} has not a valid total, so it cannot be closed`,
+        `O carrinho ${id} não possui um total válido para ser fechado`,
       );
 
     if (existentCart.itens.length == 0)
       throw new UnprocessableEntityException(
-        `The cart ${id} doesn't have itens on it, so it cannot be closed`,
+        `O carrinho ${id} não possui itens, e portanto, não pode ser fechado`,
       );
 
     existentCart.status = CartStatus.CLOSED;
