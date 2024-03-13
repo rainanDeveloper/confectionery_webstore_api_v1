@@ -41,6 +41,7 @@ describe('PaymentMethodService', () => {
     it('should create a payment method successfully', async () => {
       // Arrange
       const createPaymentMethodDto: CreatePaymentMethodDto = {
+        reference: 'BTC',
         name: 'BITCOIN',
         status: true,
       };
@@ -74,11 +75,13 @@ describe('PaymentMethodService', () => {
       const paymentMethodsMock: PaymentMethodEntity[] = [
         {
           id: randomUUID(),
+          reference: 'BTC',
           name: 'BITCOIN',
           status: true,
         },
         {
           id: randomUUID(),
+          reference: 'PAYPAL',
           name: 'PAYPAL',
           status: false,
         },
