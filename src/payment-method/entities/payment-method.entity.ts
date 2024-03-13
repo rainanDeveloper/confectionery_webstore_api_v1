@@ -5,6 +5,9 @@ export class PaymentMethodEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ name: 'reference', type: 'varchar', nullable: false })
+  reference: string;
+
   @Column({ name: 'name', type: 'varchar', nullable: false })
   name: string;
 
