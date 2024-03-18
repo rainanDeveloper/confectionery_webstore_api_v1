@@ -1,6 +1,9 @@
 # compiled output
 /dist
+
+# npm
 /node_modules
+.npmrc
 
 # Logs
 logs
