@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-customer') {
     let customer;
 
     const unauthorizedException =
-      "You're not authorized to perform this action!";
+      'Você não possui permissão para realizar esta ação';
 
     try {
       customer = await this.customerService.findOne(payload.sub);

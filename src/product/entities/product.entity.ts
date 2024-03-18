@@ -102,10 +102,13 @@ export class ProductEntity {
 
   @BeforeInsert()
   validateProduct() {
-    if (this.cost <= 0) throw new Error(`Cost cannot be less or equal zero`);
+    if (this.cost <= 0)
+      throw new Error(`Custo não pode ser menor ou igual à zero`);
 
     if (this.unitValue < this.cost)
-      throw new Error(`Product unit value cannot be lower than its cost`);
+      throw new Error(
+        `Valor unitário do produto não pode ser menor que o valor de custo`,
+      );
 
     this.profitPercent = ((this.unitValue - this.cost) / this.unitValue) * 100;
     this.profit = (this.profitPercent * this.unitValue) / 100;

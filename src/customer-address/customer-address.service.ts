@@ -55,7 +55,9 @@ export class CustomerAddressService {
   ): Promise<string> {
     const finded = await this.findOne(customerId, id);
     if (!finded) {
-      throw new NotFoundException(`Customer address ${id} wasn't found!`);
+      throw new NotFoundException(
+        `Endereço ${id} do cliente não foi encontrado`,
+      );
     }
     await this.customerAddressRepository.update(
       {
@@ -69,7 +71,9 @@ export class CustomerAddressService {
   async delete(customerId: string, id: string): Promise<string> {
     const finded = await this.findOne(customerId, id);
     if (!finded) {
-      throw new NotFoundException(`Customer address ${id} wasn't found!`);
+      throw new NotFoundException(
+        `Endereço ${id} de cliente não foi encontrado`,
+      );
     }
     await this.customerAddressRepository.delete({
       id,

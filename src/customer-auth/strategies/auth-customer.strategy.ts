@@ -24,7 +24,7 @@ export class AuthCustomerStrategy extends PassportStrategy(
     );
 
     if (!customer)
-      throw new UnauthorizedException('Login/Email and/or password is isvalid');
+      throw new UnauthorizedException('Login/Email e/ou senha não é válida');
 
     return customer;
   }

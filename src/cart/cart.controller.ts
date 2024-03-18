@@ -88,7 +88,7 @@ export class CartController {
 
     if (id) existentCart = await this.cartService.findOne(id, true);
 
-    if (!existentCart) throw new NotFoundException(`Cart not found!`);
+    if (!existentCart) throw new NotFoundException(`Carrinho não encontrado`);
 
     const item = await this.cartItemService.create({
       ...cartItemDto,
@@ -120,7 +120,7 @@ export class CartController {
 
     if (id) existentCart = await this.cartService.findOne(id, false);
 
-    if (!existentCart) throw new NotFoundException(`Cart not found!`);
+    if (!existentCart) throw new NotFoundException(`Carrinho não encontrado`);
 
     const existentItem = await this.cartItemService.findOneByIdAndCart(
       itemId,
@@ -129,7 +129,7 @@ export class CartController {
 
     if (!existentItem)
       throw new NotFoundException(
-        `Couldn't find the item ${itemId} of cart ${id}`,
+        `Não foi possível encontrar o item ${itemId} do carrinho ${id}`,
       );
 
     await this.cartItemService.delete(itemId);
