@@ -1,9 +1,9 @@
+import { PaymentMethodService } from './../payment-method/payment-method.service';
 import {
   BadRequestException,
   Inject,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,6 +25,8 @@ export class OrderService {
     private readonly cartService: CartService,
     @Inject(forwardRef(() => OrderItemService))
     private readonly orderItemService: OrderItemService,
+    @Inject(PaymentMethodService)
+    private readonly paymentMethodService: PaymentMethodService,
   ) {}
 
   async create(): Promise<OrderEntity> {
@@ -58,7 +60,7 @@ export class OrderService {
 
     if (findedCart.itens.length > 0) {
       newOrder.total = findedCart.total;
-      let itensArray: OrderItemEntity[] = []
+      const itensArray: OrderItemEntity[] = [];
       const itensPromiseArray = findedCart.itens.map(async (item) => {
         const itemDto: CreateOrderItemDto = {
           product: {
@@ -101,5 +103,9 @@ export class OrderService {
         status: OrderStatus.OPEN,
       },
     });
+  }
+
+  async getAvailablePaymentMethods() {
+    return await this.paymentMethodService.findAllWithStatusTrue();
   }
 }
