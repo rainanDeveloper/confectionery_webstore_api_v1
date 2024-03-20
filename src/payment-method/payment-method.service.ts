@@ -25,4 +25,12 @@ export class PaymentMethodService {
   async findAll(): Promise<PaymentMethodEntity[]> {
     return await this.paymentMethodRepository.find();
   }
+
+  async findAllWithStatusTrue() {
+    return await this.paymentMethodRepository.find({
+      where: {
+        status: true,
+      },
+    });
+  }
 }
